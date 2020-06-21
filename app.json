@@ -1,0 +1,15 @@
+{
+    "id": "29542a4b-5a89-4f27-872b-5f8091899f7b",
+    "version": "0.0.1",
+    "requiredApiVersion": "^1.15.0",
+    "iconFile": "icon.png",
+    "author": {
+        "name": "Ilhasoft",
+        "homepage": "https://github.com/Ilhasoft/",
+        "support": "https://github.com/Ilhasoft/"
+    },
+    "name": "RapidPro",
+    "nameSlug": "rapidpro",
+    "classFile": "RapidProApp.ts",
+    "description": "Integration between Omnichannel and RapidPro platform"
+}
