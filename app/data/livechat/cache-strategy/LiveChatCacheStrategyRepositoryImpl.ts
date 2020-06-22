@@ -36,8 +36,8 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
         return this.remoteDataSource.createVisitor(visitor);
     }
 
-    public createRoom(visitor: Visitor, department?: Department): Promise<Room> {
-        return this.remoteDataSource.createRoom(visitor, department);
+    public createRoom(visitor: Visitor): Promise<Room> {
+        return this.remoteDataSource.createRoom(visitor);
     }
 
 }

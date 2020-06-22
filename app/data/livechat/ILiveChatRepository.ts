@@ -10,6 +10,6 @@ export default interface ILiveChatRepository {
 
     createVisitor(visitor: Visitor): Promise<string>;
 
-    createRoom(visitor: Visitor, department?: Department): Promise<Room>;
+    createRoom(visitor: Visitor): Promise<Room>;
 
 }
