@@ -21,7 +21,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         const resBody = this.checkResponseBody(res.content);
 
         if (res.statusCode !== 200 || !resBody) {
-            return Promise.reject('Error retrieving departments');
+            throw Error('Error retrieving departments');
         }
         return Promise.resolve((resBody['departments'] as Array<object>).map((o) => {
             return new Department(o['_id'], o['name']);
@@ -53,7 +53,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         const resBody = this.checkResponseBody(res.content);
 
         if (res.statusCode !== 200 || !resBody) {
-            return Promise.reject('Error creating visitor');
+            throw Error('Error creating visitor');
         }
         return Promise.resolve(resBody['_id']);
     }
@@ -67,7 +67,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         const resBody = this.checkResponseBody(res.content);
 
         if (res.statusCode !== 200 || !resBody) {
-            return Promise.reject('Error getting or creating room');
+            throw Error('Error getting or creating room');
         }
         return Promise.resolve(resBody['_id']);
     }

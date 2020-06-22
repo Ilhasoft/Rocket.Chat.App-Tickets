@@ -16,6 +16,7 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
     ) {
     }
 
+    // TODO: invalidate cache
     public async getDepartments(): Promise<Array<Department>> {
         const objects = await this.reader.readByAssociation(LiveChatCacheHandler.ASSOC_DEPARTMENTS);
         return objects.map((o) => o as Department);
@@ -23,11 +24,9 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
 
     public async saveDepartments(departments: Array<Department>): Promise<number> {
         await this.writer.removeByAssociation(LiveChatCacheHandler.ASSOC_DEPARTMENTS);
-
-        const addAll = departments.map((d) => {
-            return this.writer.createWithAssociation(d, LiveChatCacheHandler.ASSOC_DEPARTMENTS);
+        departments.map(async (d) => {
+            await this.writer.createWithAssociation(d, LiveChatCacheHandler.ASSOC_DEPARTMENTS);
         });
-        await Promise.all(addAll);
         return Promise.resolve(departments.length);
     }
 
