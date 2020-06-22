@@ -3,14 +3,14 @@ import ILiveChatRemoteDataSource from '../../../data/livechat/cache-strategy/ILi
 import Department from '../../../domain/Department';
 import Room from '../../../domain/Room';
 import Visitor from '../../../domain/Visitor';
-import LiveChatCredentials from './LiveChatCredentials';
+import ILiveChatCredentials from './ILiveChatCredentials';
 
 export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
 
     constructor(
         private readonly http: IHttp,
         private readonly baseUrl: string,
-        private readonly credentials: LiveChatCredentials,
+        private readonly credentials: ILiveChatCredentials,
         private readonly timeout: number,
     ) {
         this.timeout = this.timeout < 5 ? 5 : this.timeout;
@@ -24,28 +24,18 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
             throw Error('Error retrieving departments');
         }
         return Promise.resolve((resBody['departments'] as Array<object>).map((o) => {
-            return new Department(o['_id'], o['name']);
+            return {
+                id: o['_id'],
+                name: o['name']
+            } as Department;
         }));
     }
 
-    public async createVisitor(visitor: Visitor): Promise<string> {
+    public async createVisitor(visitor: Visitor): Promise<Visitor> {
         const payload = {
-            visitor: {
-                token: visitor.token,
-                department: visitor.departmentId,
-                name: visitor.name,
-                email: visitor.email,
-                phone: visitor.phoneNumber,
-                customFields: [] as Array<object>,
-            },
+            visitor,
         };
-        for (const k of visitor.customFields.keys()) {
-            payload.visitor.customFields.push({
-                key: k,
-                value: visitor.customFields.get(k),
-                overwrite: true,
-            });
-        }
+
         const reqOptions = this.requestOptions();
         reqOptions['content'] = JSON.stringify(payload);
 
@@ -53,12 +43,13 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         const resBody = this.checkResponseBody(res.content);
 
         if (res.statusCode !== 200 || !resBody) {
-            throw Error('Error creating visitor');
+            throw Error('Error creating visitor: ' + res.data.error);
         }
-        return Promise.resolve(resBody['_id']);
+
+        return Promise.resolve(payload.visitor);
     }
 
-    public async createRoom(visitor: Visitor, department?: Department): Promise<Room> {
+    public async createRoom(visitor: Visitor): Promise<Room> {
         const payload = {token: visitor.token};
         const reqOptions = this.requestOptions();
         reqOptions['params'] = payload;
@@ -67,7 +58,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         const resBody = this.checkResponseBody(res.content);
 
         if (res.statusCode !== 200 || !resBody) {
-            throw Error('Error getting or creating room');
+            throw Error('Error getting or creating room: ' + res.data.error);
         }
         return Promise.resolve(resBody['_id']);
     }
@@ -79,7 +70,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
                 'X-Auth-Token': this.credentials.authToken,
                 'X-User-Id': this.credentials.userId,
             },
-            timeout: this.timeout,
+            // timeout: this.timeout,
         };
     }
 

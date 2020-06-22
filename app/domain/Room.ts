@@ -1,8 +1,5 @@
-export default class Room {
+export default interface Room {
 
-    constructor(
-        public readonly id: string,
-    ) {
-    }
+    readonly id: string
 
 }

@@ -6,7 +6,7 @@ export default interface ILiveChatRemoteDataSource {
 
     getDepartments(): Promise<Array<Department>>;
 
-    createVisitor(visitor: Visitor): Promise<string>;
+    createVisitor(visitor: Visitor): Promise<Visitor>;
 
     createRoom(visitor: Visitor): Promise<Room>;
 

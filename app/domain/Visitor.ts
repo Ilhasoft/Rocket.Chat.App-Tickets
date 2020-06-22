@@ -1,13 +1,10 @@
-export default class Visitor {
+export default interface Visitor {
 
-    constructor(
-        public readonly token: string,
-        public readonly departmentId: string,
-        public readonly name: string,
-        public readonly email: string,
-        public readonly phoneNumber: string,
-        public readonly customFields: Map<string, string>,
-    ) {
-    }
+    readonly token: string,
+    readonly department: string,
+    readonly name: string,
+    readonly email: string,
+    readonly phone: string,
+    readonly customFields: Array<object>
 
 }

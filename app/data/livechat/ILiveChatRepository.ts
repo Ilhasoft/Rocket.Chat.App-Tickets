@@ -8,7 +8,7 @@ export default interface ILiveChatRepository {
 
     getDepartmentByName(name: string): Promise<Department | undefined>;
 
-    createVisitor(visitor: Visitor): Promise<string>;
+    createVisitor(visitor: Visitor): Promise<Visitor>;
 
     createRoom(visitor: Visitor): Promise<Room>;
 

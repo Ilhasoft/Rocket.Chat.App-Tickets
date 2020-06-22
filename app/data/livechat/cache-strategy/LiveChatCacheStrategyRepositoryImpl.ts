@@ -27,12 +27,10 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
 
     public async getDepartmentByName(name: string): Promise<Department | undefined> {
         const departments = await this.getDepartments();
-        const found = departments.find((d) => d.name === name);
-
-        return Promise.resolve(found);
+        return departments.find((d) => d.name === name);
     }
 
-    public createVisitor(visitor: Visitor): Promise<string> {
+    public createVisitor(visitor: Visitor): Promise<Visitor> {
         return this.remoteDataSource.createVisitor(visitor);
     }
 
