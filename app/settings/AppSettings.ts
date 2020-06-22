@@ -6,7 +6,7 @@ import {
     PUSH_TAKEN_FLOW,
     PUSH_TOKEN,
     RC_CRM_URL, REQUEST_TIMEOUT
-} from "./app/settings/Constants";
+} from "./Constants";
 
 export const AppSettings: Array<ISetting> = [
     {
