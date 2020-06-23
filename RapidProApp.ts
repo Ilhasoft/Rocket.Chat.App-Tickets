@@ -7,7 +7,7 @@ import {
 import {ApiSecurity, ApiVisibility, IApi} from '@rocket.chat/apps-engine/definition/api';
 import {App} from '@rocket.chat/apps-engine/definition/App';
 import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
-import {CreateRoomEndpoint} from './app/endpoints/CreateRoomEndpoint';
+import {CreateRoomEndpoint} from './app/endpoint/CreateRoomEndpoint';
 import {AppSettings} from './app/settings/AppSettings';
 
 export class RapidProApp extends App {
