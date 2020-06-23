@@ -1,5 +1,6 @@
-import {IHttp} from '@rocket.chat/apps-engine/definition/accessors';
+import {HttpStatusCode, IHttp} from '@rocket.chat/apps-engine/definition/accessors';
 import ILiveChatRemoteDataSource from '../../../data/livechat/cache-strategy/ILiveChatRemoteDataSource';
+import AppError from '../../../domain/AppError';
 import Department from '../../../domain/Department';
 import Room from '../../../domain/Room';
 import Visitor from '../../../domain/Visitor';
@@ -21,14 +22,14 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         const resBody = this.checkResponseBody(res.content);
 
         if (res.statusCode !== 200 || !resBody) {
-            throw Error('Error retrieving departments');
+            throw new AppError('Error retrieving departments', res.statusCode);
         }
-        return Promise.resolve((resBody['departments'] as Array<object>).map((o) => {
-            return {
-                id: o['_id'],
-                name: o['name'],
-            } as Department;
-        }));
+
+        const departments = (resBody['departments'] as Array<object>).map((o) => {
+            return { id: o['_id'], name: o['name'] } as Department;
+        });
+
+        return departments;
     }
 
     public async createVisitor(visitor: Visitor): Promise<Visitor> {
@@ -42,10 +43,10 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         const resBody = this.checkResponseBody(res.content);
 
         if (res.statusCode !== 200 || !resBody) {
-            throw Error('Error creating visitor: ' + res.data.error);
+            throw new AppError('Error creating visitor', res.statusCode);
         }
 
-        return Promise.resolve(payload.visitor);
+        return visitor;
     }
 
     public async createRoom(visitor: Visitor): Promise<Room> {
@@ -57,9 +58,10 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         const resBody = this.checkResponseBody(res.content);
 
         if (res.statusCode !== 200 || !resBody) {
-            throw Error('Error getting or creating room: ' + res.data.error);
+            throw new AppError('Error getting or creating room', res.statusCode);
         }
-        return Promise.resolve(resBody['_id']);
+
+        return resBody['_id'];
     }
 
     private requestOptions(): object {

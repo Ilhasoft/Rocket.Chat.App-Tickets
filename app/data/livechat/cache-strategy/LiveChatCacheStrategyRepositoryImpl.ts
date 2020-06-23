@@ -1,3 +1,5 @@
+import { HttpStatusCode } from '@rocket.chat/apps-engine/definition/accessors';
+import AppError from '../../../domain/AppError';
 import Department from '../../../domain/Department';
 import Room from '../../../domain/Room';
 import Visitor from '../../../domain/Visitor';
@@ -17,12 +19,12 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
         const cache = await this.cacheDataSource.getDepartments();
 
         if (cache.length > 0) {
-            return Promise.resolve(cache);
+            return cache;
         }
         const departments = await this.remoteDataSource.getDepartments();
         await this.cacheDataSource.saveDepartments(departments);
 
-        return Promise.resolve(departments);
+        return  departments;
     }
 
     public async getDepartmentByName(name: string): Promise<Department | undefined> {

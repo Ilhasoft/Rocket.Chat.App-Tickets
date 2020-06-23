@@ -27,7 +27,7 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
         departments.map(async (d) => {
             await this.writer.createWithAssociation(d, LiveChatCacheHandler.ASSOC_DEPARTMENTS);
         });
-        return Promise.resolve(departments.length);
+        return departments.length;
     }
 
 }
