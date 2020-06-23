@@ -32,12 +32,12 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
         return departments.find((d) => d.name === name);
     }
 
-    public createVisitor(visitor: Visitor): Promise<Visitor> {
-        return this.remoteDataSource.createVisitor(visitor);
+    public async createVisitor(visitor: Visitor): Promise<Visitor> {
+        return await this.remoteDataSource.createVisitor(visitor);
     }
 
-    public createRoom(visitor: Visitor): Promise<Room> {
-        return this.remoteDataSource.createRoom(visitor);
+    public async createRoom(visitor: Visitor): Promise<Room> {
+        return await this.remoteDataSource.createRoom(visitor);
     }
 
 }
