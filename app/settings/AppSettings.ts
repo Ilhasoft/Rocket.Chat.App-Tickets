@@ -1,22 +1,15 @@
 import { ISetting, SettingType} from '@rocket.chat/apps-engine/definition/settings';
 import {
     PUSH_BASE_URL,
-    PUSH_CLOSED_FLOW, PUSH_MEDIA_FLOW,
+    PUSH_CLOSED_FLOW,
+    PUSH_MEDIA_FLOW,
     PUSH_QUEUED_FLOW,
     PUSH_TAKEN_FLOW,
     PUSH_TOKEN,
-    RC_CRM_URL, REQUEST_TIMEOUT
-} from "./Constants";
+    REQUEST_TIMEOUT,
+} from './Constants';
 
 export const AppSettings: Array<ISetting> = [
-    {
-        id: RC_CRM_URL,
-        type: SettingType.STRING,
-        packageValue: '',
-        required: false,
-        public: false,
-        i18nLabel: 'config_rc_crm_url',
-    },
     {
         id: PUSH_BASE_URL,
         type: SettingType.STRING,
@@ -49,7 +42,6 @@ export const AppSettings: Array<ISetting> = [
         public: false,
         i18nLabel: 'config_push_queued_flow',
     },
-
     {
         id: PUSH_CLOSED_FLOW,
         type: SettingType.STRING,
@@ -74,4 +66,4 @@ export const AppSettings: Array<ISetting> = [
         public: false,
         i18nLabel: 'config_push_timeout',
     },
-]
+];

@@ -1,12 +1,14 @@
 import {
-    IAppAccessors, IConfigurationExtend, IEnvironmentRead,
+    IAppAccessors,
+    IConfigurationExtend,
+    IEnvironmentRead,
     ILogger,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import { App } from '@rocket.chat/apps-engine/definition/App';
-import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
-import {ApiSecurity, ApiVisibility, IApi} from "@rocket.chat/apps-engine/definition/api";
-import {CreateRoomEndpoint} from "./app/endpoints/CreateRoomEndpoint";
-import { AppSettings } from "./app/settings/AppSettings";
+import {ApiSecurity, ApiVisibility, IApi} from '@rocket.chat/apps-engine/definition/api';
+import {App} from '@rocket.chat/apps-engine/definition/App';
+import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
+import {CreateRoomEndpoint} from './app/endpoints/CreateRoomEndpoint';
+import {AppSettings} from './app/settings/AppSettings';
 
 export class RapidProApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {

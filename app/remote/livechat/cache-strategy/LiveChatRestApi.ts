@@ -26,7 +26,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         return Promise.resolve((resBody['departments'] as Array<object>).map((o) => {
             return {
                 id: o['_id'],
-                name: o['name']
+                name: o['name'],
             } as Department;
         }));
     }
@@ -35,7 +35,6 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         const payload = {
             visitor,
         };
-
         const reqOptions = this.requestOptions();
         reqOptions['content'] = JSON.stringify(payload);
 
