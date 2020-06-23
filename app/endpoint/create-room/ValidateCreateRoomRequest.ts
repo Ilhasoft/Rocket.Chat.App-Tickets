@@ -1,36 +1,43 @@
 import {validate} from '../../lib/validatejs/0_13_1/validate';
 
-export default function validateQuery(query: object): any {
+export default function validateRequest(query: any): any {
+
+    console.log('query: ', query);
 
     const constraints = {
-        department: {
+        'visitor': {
+            presence: {
+                allowEmpty: false,
+            },
+        },
+        'visitor.department': {
             presence: {
                 allowEmpty: false,
             },
             type: 'string',
         },
-        token: {
+        'visitor.token': {
             presence: {
                 allowEmpty: false,
             },
             type: 'string',
         },
-        name: {
+        'visitor.name': {
             presence: {
                 allowEmpty: false,
             },
             type: 'string',
         },
-        priority: {
+        'visitor.priority': {
             presence: false,
             type: 'number',
         },
-        email: {
+        'visitor.email': {
             presence: false,
             email: true,
             type: 'string',
         },
-        phone: {
+        'visitor.phone': {
             presence: false,
             type: 'string',
         },

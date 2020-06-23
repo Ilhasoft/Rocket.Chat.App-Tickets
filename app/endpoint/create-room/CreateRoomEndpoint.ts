@@ -8,12 +8,12 @@ import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCa
 import ILiveChatCredentials from '../../remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from '../../remote/livechat/cache-strategy/LiveChatRestApi';
 import {RC_SERVER_URL, REQUEST_TIMEOUT} from '../../settings/Constants';
-import validateQuery from './ValidateCreateRoomQuery';
+import validateRequest from './ValidateCreateRoomRequest';
 
 export class CreateRoomEndpoint extends ApiEndpoint {
     public path = 'create-room';
 
-    public async get(
+    public async post(
         request: IApiRequest,
         endpoint: IApiEndpointInfo,
         read: IRead,
@@ -23,7 +23,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
     ): Promise<IApiResponseJSON> {
 
         // Query parameters verification
-        const errors = validateQuery(request.query);
+        const errors = validateRequest(request.content);
         if (errors) {
             const errorMessage = `Invalid query parameters...: ${JSON.stringify(errors)}`;
             this.app.getLogger().error(errorMessage);
@@ -45,7 +45,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         );
 
         // Check if department is a valid one
-        const departmentName = request.query.department;
+        const departmentName = request.content.department;
         if (departmentName) {
             const department = await livechatRepo.getDepartmentByName(departmentName);
             if (!department) {
@@ -56,7 +56,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
 
         // Execute visitor and room creation
         try {
-            const visitor: Visitor = await livechatRepo.createVisitor((request.query as any) as Visitor);
+            const visitor: Visitor = await livechatRepo.createVisitor(request.content.visitor as Visitor);
             await livechatRepo.createRoom(visitor);
         } catch (e) {
             this.app.getLogger().error(e);
@@ -69,4 +69,5 @@ export class CreateRoomEndpoint extends ApiEndpoint {
 
         return this.success();
     }
+
 }
