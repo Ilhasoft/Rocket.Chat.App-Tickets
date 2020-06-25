@@ -37,7 +37,13 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
     }
 
     public async createRoom(visitor: Visitor): Promise<Room> {
-        return await this.remoteDataSource.createRoom(visitor);
+        const cache = await this.cacheDataSource.getVisitor(visitor.token);
+        if (cache) {
+            throw new AppError(`Visitor already exists`, HttpStatusCode.BAD_REQUEST);
+        }
+        const room = await this.remoteDataSource.createRoom(visitor);
+        await this.cacheDataSource.saveVisitor(visitor);
+        return room;
     }
 
 }
