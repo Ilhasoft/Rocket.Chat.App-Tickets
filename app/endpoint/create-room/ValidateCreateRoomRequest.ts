@@ -16,7 +16,7 @@ export default function validateRequest(query: any): any {
             },
             type: 'string',
         },
-        'visitor.token': {
+        'visitor.contactUuid': {
             presence: {
                 allowEmpty: false,
             },

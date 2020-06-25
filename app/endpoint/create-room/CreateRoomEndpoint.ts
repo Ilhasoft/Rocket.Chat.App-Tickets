@@ -32,7 +32,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
 
         // Constants initialization
         const baseUrl: string = await read.getEnvironmentReader().getServerSettings().getValueById(RC_SERVER_URL);
-        const timeout = await read.getEnvironmentReader().getSettings().getValueById(REQUEST_TIMEOUT);
+        const timeout: number = await read.getEnvironmentReader().getSettings().getValueById(REQUEST_TIMEOUT);
         const credentials: ILiveChatCredentials = {
             authToken: request.headers['x-auth-token'],
             userId: request.headers['x-user-id'],
@@ -49,15 +49,18 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         if (departmentName) {
             const department = await livechatRepo.getDepartmentByName(departmentName);
             if (!department) {
-                this.app.getLogger().error(`Could not find department with name: ${departmentName}`);
-                return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: `Could not find department with name: ${departmentName}`}});
+                const errorMessage = `Could not find department with name: ${departmentName}`;
+                this.app.getLogger().error(errorMessage);
+                return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: errorMessage}});
             }
         }
 
         // Execute visitor and room creation
         try {
-            const visitor: Visitor = await livechatRepo.createVisitor(request.content.visitor as Visitor);
-            await livechatRepo.createRoom(visitor);
+            const visitor = request.content.visitor as Visitor;
+            visitor.token = request.content.visitor.contactUuid;
+            const createdVisitor: Visitor = await livechatRepo.createVisitor(visitor);
+            await livechatRepo.createRoom(createdVisitor);
         } catch (e) {
             this.app.getLogger().error(e);
             if (e instanceof AppError) {
@@ -67,7 +70,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
         }
 
-        return this.success();
+        return this.json({status: HttpStatusCode.CREATED});
     }
 
 }
