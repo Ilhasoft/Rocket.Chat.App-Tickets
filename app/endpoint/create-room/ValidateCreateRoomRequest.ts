@@ -1,5 +1,7 @@
 import {validate} from '../../lib/validatejs/0_13_1/validate';
 
+const contactUuidFormat = `[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}`;
+
 export default function validateRequest(query: any): any {
 
     console.log('query: ', query);
@@ -21,6 +23,9 @@ export default function validateRequest(query: any): any {
                 allowEmpty: false,
             },
             type: 'string',
+            format: {
+                pattern: contactUuidFormat,
+            },
         },
         'visitor.name': {
             presence: {
