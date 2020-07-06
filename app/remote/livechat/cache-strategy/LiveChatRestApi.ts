@@ -1,4 +1,4 @@
-import {HttpStatusCode, IHttp} from '@rocket.chat/apps-engine/definition/accessors';
+import {IHttp} from '@rocket.chat/apps-engine/definition/accessors';
 import ILiveChatRemoteDataSource from '../../../data/livechat/cache-strategy/ILiveChatRemoteDataSource';
 import AppError from '../../../domain/AppError';
 import Department from '../../../domain/Department';
@@ -61,7 +61,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
             throw new AppError('Error getting or creating room', res.statusCode);
         }
 
-        return resBody['_id'];
+        return {id: resBody['_id']} as Room;
     }
 
     private requestOptions(): object {
@@ -71,6 +71,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
                 'X-Auth-Token': this.credentials.authToken,
                 'X-User-Id': this.credentials.userId,
             },
+            // TODO: check timeout parameter
             // timeout: this.timeout,
         };
     }

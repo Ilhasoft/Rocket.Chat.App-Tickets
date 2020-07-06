@@ -12,4 +12,6 @@ export default interface ILiveChatRepository {
 
     createRoom(visitor: Visitor): Promise<Room>;
 
+    closeRoom(visitor: Visitor): Promise<void>;
+
 }

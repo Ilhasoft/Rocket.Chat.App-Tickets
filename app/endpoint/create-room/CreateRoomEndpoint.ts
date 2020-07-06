@@ -63,7 +63,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             await livechatRepo.createRoom(createdVisitor);
         } catch (e) {
             this.app.getLogger().error(e);
-            if (e instanceof AppError) {
+            if (e.constructor.name === AppError.name) {
                 return this.json({status: e.statusCode, content: {error: e.message}});
             }
 
