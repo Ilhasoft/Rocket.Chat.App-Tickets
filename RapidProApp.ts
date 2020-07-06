@@ -17,6 +17,9 @@ import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCa
 import RapidProRestApi from './app/remote/rapidpro/RapidProRestApi';
 import {AppSettings} from './app/settings/AppSettings';
 import { PUSH_BASE_URL, PUSH_CLOSED_FLOW, PUSH_TOKEN, REQUEST_TIMEOUT } from './app/settings/Constants';
+import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
+import LiveChatRestApi from './app/remote/livechat/cache-strategy/LiveChatRestApi';
+import ILiveChatCredentials from './app/remote/livechat/cache-strategy/ILiveChatCredentials';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -43,8 +46,12 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
     public async executeLivechatRoomClosedHandler(data: ILivechatRoom, read: IRead, http: IHttp, persistence: IPersistence) {
         const visitor: Visitor = (data.visitor as any) as Visitor;
 
-        const livechatCache = new LiveChatCacheHandler(read.getPersistenceReader(), persistence);
-        await livechatCache.deleteVisitor(visitor);
+        const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
+            new LiveChatCacheHandler(read.getPersistenceReader(), persistence),
+            new LiveChatRestApi(http, '', {} as ILiveChatCredentials, 0),
+        );
+
+        await livechatRepo.closeRoom(visitor);
 
         const baseUrl = await read.getEnvironmentReader().getSettings().getValueById(PUSH_BASE_URL);
         const authToken = await read.getEnvironmentReader().getSettings().getValueById(PUSH_TOKEN);
@@ -56,7 +63,9 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
             agent: data.servedBy,
             livechat: data,
         };
+        // TODO: change to ticket implementation later
         await rapidpro.startFlow(closeTicket, visitor, extra);
+        // TODO: broadcast agent message on room close
     }
 
 }

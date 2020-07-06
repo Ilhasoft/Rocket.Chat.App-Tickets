@@ -46,4 +46,11 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
         return room;
     }
 
+    public async closeRoom(visitor: Visitor): Promise<void> {
+        const cache = await this.cacheDataSource.getVisitor(visitor.token);
+        if (cache) {
+            await this.cacheDataSource.deleteVisitor(visitor);
+        }
+    }
+
 }

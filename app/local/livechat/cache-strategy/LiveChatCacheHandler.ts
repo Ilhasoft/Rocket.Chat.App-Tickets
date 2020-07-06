@@ -41,7 +41,7 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
     public async getVisitor(token: string): Promise<Visitor | undefined> {
         const visitors = await this.reader.readByAssociation(LiveChatCacheHandler.ASSOC_VISITOR(token));
         const found = visitors.find((o: Visitor) => o.token === token);
-        console.log('Found visitor: ', found);
+
         return found as Visitor;
     }
 
@@ -53,13 +53,6 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
         const v = await this.getVisitor(visitor.token);
         if (v) {
             await this.writer.removeByAssociation(LiveChatCacheHandler.ASSOC_VISITOR(v.token));
-        }
-    }
-
-    public async closeRoom(visitor: Visitor): Promise<void> {
-        const cache = await this.getVisitor(visitor.token);
-        if (cache) {
-            await this.deleteVisitor(visitor);
         }
     }
 
