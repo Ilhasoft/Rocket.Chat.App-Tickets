@@ -23,6 +23,7 @@ import RapidProRestApi from './app/remote/rapidpro/RapidProRestApi';
 import {AppSettings} from './app/settings/AppSettings';
 import { PUSH_BASE_URL, PUSH_CLOSED_FLOW, PUSH_TOKEN, REQUEST_TIMEOUT } from './app/settings/Constants';
 import { ISetting } from '@rocket.chat/apps-engine/definition/settings';
+import { SetCallbackEndpoint } from './app/endpoint/set-callback/SetCallbackEndpoint';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -37,6 +38,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
             endpoints: [
                 new CreateRoomEndpoint(this),
                 new VisitorMesssageEndpoint(this),
+                new SetCallbackEndpoint(this),
             ],
         } as IApi);
         this.getLogger().log('RapidPro App Initialized');
