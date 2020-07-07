@@ -6,6 +6,7 @@ import {
     ILogger,
     IPersistence,
     IRead,
+    IConfigurationModify,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import {ApiSecurity, ApiVisibility, IApi} from '@rocket.chat/apps-engine/definition/api';
 import {App} from '@rocket.chat/apps-engine/definition/App';
@@ -14,12 +15,14 @@ import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
 import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
 import Visitor from './app/domain/Visitor';
 import {CreateRoomEndpoint} from './app/endpoint/create-room/CreateRoomEndpoint';
+import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
 import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
 import ILiveChatCredentials from './app/remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from './app/remote/livechat/cache-strategy/LiveChatRestApi';
 import RapidProRestApi from './app/remote/rapidpro/RapidProRestApi';
 import {AppSettings} from './app/settings/AppSettings';
 import { PUSH_BASE_URL, PUSH_CLOSED_FLOW, PUSH_TOKEN, REQUEST_TIMEOUT } from './app/settings/Constants';
+import { ISetting } from '@rocket.chat/apps-engine/definition/settings';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -33,6 +36,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
             security: ApiSecurity.UNSECURE,
             endpoints: [
                 new CreateRoomEndpoint(this),
+                new VisitorMesssageEndpoint(this),
             ],
         } as IApi);
         this.getLogger().log('RapidPro App Initialized');

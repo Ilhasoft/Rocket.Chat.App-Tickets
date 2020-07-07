@@ -61,7 +61,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
             throw new AppError('Error getting or creating room', res.statusCode);
         }
 
-        return {id: resBody['_id']} as Room;
+        return {id: resBody['room']['_id']} as Room;
     }
 
     private requestOptions(): object {

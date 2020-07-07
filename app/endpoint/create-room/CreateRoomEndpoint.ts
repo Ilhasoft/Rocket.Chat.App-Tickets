@@ -7,7 +7,7 @@ import Visitor from '../../domain/Visitor';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
 import ILiveChatCredentials from '../../remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from '../../remote/livechat/cache-strategy/LiveChatRestApi';
-import {RC_SERVER_URL, REQUEST_TIMEOUT} from '../../settings/Constants';
+import { RC_ACCESS_TOKEN, RC_SERVER_URL, RC_USER_ID, REQUEST_TIMEOUT } from '../../settings/Constants';
 import validateRequest from './ValidateCreateRoomRequest';
 
 export class CreateRoomEndpoint extends ApiEndpoint {
@@ -34,8 +34,8 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         const baseUrl: string = await read.getEnvironmentReader().getServerSettings().getValueById(RC_SERVER_URL);
         const timeout: number = await read.getEnvironmentReader().getSettings().getValueById(REQUEST_TIMEOUT);
         const credentials: ILiveChatCredentials = {
-            authToken: request.headers['x-auth-token'],
-            userId: request.headers['x-user-id'],
+            authToken: await read.getEnvironmentReader().getSettings().getValueById(RC_ACCESS_TOKEN),
+            userId: await read.getEnvironmentReader().getSettings().getValueById(RC_USER_ID),
         };
 
         // livechatRepo initialization

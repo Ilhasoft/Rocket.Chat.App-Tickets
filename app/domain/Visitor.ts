@@ -5,6 +5,7 @@ export default interface Visitor {
     name: string;
     email: string;
     phone: string;
+    roomId: string;
     customFields: Map<string, string>;
 
 }

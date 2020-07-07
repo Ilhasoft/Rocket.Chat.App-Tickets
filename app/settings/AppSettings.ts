@@ -6,10 +6,28 @@ import {
     PUSH_QUEUED_FLOW,
     PUSH_TAKEN_FLOW,
     PUSH_TOKEN,
+    RC_ACCESS_TOKEN,
+    RC_USER_ID,
     REQUEST_TIMEOUT,
 } from './Constants';
 
 export const AppSettings: Array<ISetting> = [
+    {
+        id: RC_ACCESS_TOKEN,
+        type: SettingType.STRING,
+        packageValue: '',
+        required: true,
+        public: false,
+        i18nLabel: 'rc_access_token',
+    },
+    {
+        id: RC_USER_ID,
+        type: SettingType.STRING,
+        packageValue: '',
+        required: true,
+        public: false,
+        i18nLabel: 'rc_user_id',
+    },
     {
         id: PUSH_BASE_URL,
         type: SettingType.STRING,
