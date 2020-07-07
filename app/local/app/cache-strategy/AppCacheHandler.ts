@@ -1,5 +1,5 @@
-import { IPersistenceRead, IPersistence } from '@rocket.chat/apps-engine/definition/accessors';
-import { RocketChatAssociationRecord, RocketChatAssociationModel } from '@rocket.chat/apps-engine/definition/metadata';
+import { IPersistence, IPersistenceRead } from '@rocket.chat/apps-engine/definition/accessors';
+import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
 import IAppCacheDataSource from '../../../data/app/cache-strategy/IAppCacheDataSource';
 import { CALLBACK_URL_PERSISTENCE } from '../../../settings/Constants';
 

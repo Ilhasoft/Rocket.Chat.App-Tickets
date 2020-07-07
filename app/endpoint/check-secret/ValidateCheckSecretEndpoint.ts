@@ -1,14 +1,14 @@
 import {validate} from '../../lib/validatejs/0_13_1/validate';
 
+// TODO: dar match com regex
 export default function validateRequest(query: any): any {
 
     const constraints = {
-        'url': {
+        'secret': {
             presence: {
                 allowEmpty: false,
             },
             type: 'string',
-            url: true,
         },
     };
 
