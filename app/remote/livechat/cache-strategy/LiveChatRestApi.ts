@@ -1,9 +1,8 @@
 import {IHttp} from '@rocket.chat/apps-engine/definition/accessors';
+import { ILivechatRoom, IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 import ILiveChatRemoteDataSource from '../../../data/livechat/cache-strategy/ILiveChatRemoteDataSource';
 import AppError from '../../../domain/AppError';
 import Department from '../../../domain/Department';
-import Room from '../../../domain/Room';
-import Visitor from '../../../domain/Visitor';
 import ILiveChatCredentials from './ILiveChatCredentials';
 
 export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
@@ -32,7 +31,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         return departments;
     }
 
-    public async createVisitor(visitor: Visitor): Promise<Visitor> {
+    public async createVisitor(visitor: IVisitor): Promise<IVisitor> {
         const payload = {
             visitor,
         };
@@ -49,7 +48,7 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         return visitor;
     }
 
-    public async createRoom(visitor: Visitor): Promise<Room> {
+    public async createRoom(visitor: IVisitor): Promise<ILivechatRoom> {
         const payload = {token: visitor.token};
         const reqOptions = this.requestOptions();
         reqOptions['params'] = payload;
@@ -61,7 +60,18 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
             throw new AppError('Error getting or creating room', res.statusCode);
         }
 
-        return {id: resBody['room']['_id']} as Room;
+        const resRoom = resBody['room'];
+        const livechatRoom = {
+            visitor,
+            department: visitor.department,
+            servedBy: resRoom.servedBy,
+            isWaitingResponse: resRoom.waitingResponse,
+            isOpen: resRoom.open,
+            type: resRoom.t,
+            id: resRoom._id,
+        } as ILivechatRoom;
+
+        return livechatRoom;
     }
 
     private requestOptions(): object {

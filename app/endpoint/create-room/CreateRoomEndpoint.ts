@@ -1,10 +1,11 @@
 import {HttpStatusCode, IHttp, IModify, IPersistence, IRead} from '@rocket.chat/apps-engine/definition/accessors';
 import {ApiEndpoint, IApiEndpointInfo, IApiRequest} from '@rocket.chat/apps-engine/definition/api';
 import {IApiResponseJSON} from '@rocket.chat/apps-engine/definition/api/IResponse';
+import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
 import AppError from '../../domain/AppError';
-import Visitor from '../../domain/Visitor';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
+import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
 import ILiveChatCredentials from '../../remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from '../../remote/livechat/cache-strategy/LiveChatRestApi';
 import { RC_ACCESS_TOKEN, RC_SERVER_URL, RC_USER_ID, REQUEST_TIMEOUT } from '../../settings/Constants';
@@ -42,9 +43,11 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
             new LiveChatCacheHandler(read.getPersistenceReader(), persis),
             new LiveChatRestApi(http, baseUrl, credentials, timeout),
+            new LiveChatInternalHandler(modify),
         );
 
         // Check if department is a valid one
+        // TODO: check if this is working properly
         const departmentName = request.content.department;
         if (departmentName) {
             const department = await livechatRepo.getDepartmentByName(departmentName);
@@ -57,9 +60,9 @@ export class CreateRoomEndpoint extends ApiEndpoint {
 
         // Execute visitor and room creation
         try {
-            const visitor = request.content.visitor as Visitor;
+            const visitor = request.content.visitor as IVisitor;
             visitor.token = request.content.visitor.contactUuid;
-            const createdVisitor: Visitor = await livechatRepo.createVisitor(visitor);
+            const createdVisitor = await livechatRepo.createVisitor(visitor);
             await livechatRepo.createRoom(createdVisitor);
         } catch (e) {
             this.app.getLogger().error(e);

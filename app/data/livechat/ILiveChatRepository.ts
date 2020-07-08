@@ -1,6 +1,6 @@
+import { ILivechatRoom, IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
+import { IMessageAttachment } from '@rocket.chat/apps-engine/definition/messages';
 import Department from '../../domain/Department';
-import Room from '../../domain/Room';
-import Visitor from '../../domain/Visitor';
 
 export default interface ILiveChatRepository {
 
@@ -8,12 +8,14 @@ export default interface ILiveChatRepository {
 
     getDepartmentByName(name: string): Promise<Department | undefined>;
 
-    createVisitor(visitor: Visitor): Promise<Visitor>;
+    createVisitor(visitor: IVisitor): Promise<IVisitor>;
 
-    getVisitor(token: string): Promise<Visitor | undefined>;
+    getRoomByVisitor(token: string): Promise<ILivechatRoom | undefined>;
 
-    createRoom(visitor: Visitor): Promise<Room>;
+    createRoom(visitor: IVisitor): Promise<ILivechatRoom>;
 
-    closeRoom(visitor: Visitor): Promise<void>;
+    closeRoom(room: ILivechatRoom): Promise<void>;
+
+    sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom);
 
 }
