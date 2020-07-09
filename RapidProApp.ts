@@ -7,13 +7,13 @@ import {
     IPersistence,
     IRead,
     IConfigurationModify,
+    IModify,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import {ApiSecurity, ApiVisibility, IApi} from '@rocket.chat/apps-engine/definition/api';
 import {App} from '@rocket.chat/apps-engine/definition/App';
-import {ILivechatRoom, ILivechatRoomClosedHandler} from '@rocket.chat/apps-engine/definition/livechat';
+import {ILivechatRoom, ILivechatRoomClosedHandler, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
 import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
-import Visitor from './app/domain/Visitor';
 import {CreateRoomEndpoint} from './app/endpoint/create-room/CreateRoomEndpoint';
 import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
 import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
@@ -24,6 +24,7 @@ import {AppSettings} from './app/settings/AppSettings';
 import { PUSH_BASE_URL, PUSH_CLOSED_FLOW, PUSH_TOKEN, REQUEST_TIMEOUT } from './app/settings/Constants';
 import { ISetting } from '@rocket.chat/apps-engine/definition/settings';
 import { SetCallbackEndpoint } from './app/endpoint/set-callback/SetCallbackEndpoint';
+import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveChatInternalHandler';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -50,14 +51,20 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
 
     // TODO: executePostLivechatRoomClosed is being executed twice, check why (bug?) and change to that in the future
     public async executeLivechatRoomClosedHandler(data: ILivechatRoom, read: IRead, http: IHttp, persistence: IPersistence) {
-        const visitor: Visitor = (data.visitor as any) as Visitor;
+        const visitor: IVisitor = (data.visitor as any) as IVisitor;
 
         const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
             new LiveChatCacheHandler(read.getPersistenceReader(), persistence),
             new LiveChatRestApi(http, '', {} as ILiveChatCredentials, 0),
+            new LiveChatInternalHandler({} as IModify),
         );
 
-        await livechatRepo.closeRoom(visitor);
+        const room = await livechatRepo.getRoomByVisitorToken(visitor.token);
+        if (!room) {
+            const errorMessage = `Could not find room for visitor with token: ${visitor.token}`;
+            this.getLogger().error(errorMessage);
+        }
+        await livechatRepo.closeRoom(room!);
 
         const baseUrl = await read.getEnvironmentReader().getSettings().getValueById(PUSH_BASE_URL);
         const authToken = await read.getEnvironmentReader().getSettings().getValueById(PUSH_TOKEN);
