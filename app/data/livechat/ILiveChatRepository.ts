@@ -10,7 +10,7 @@ export default interface ILiveChatRepository {
 
     createVisitor(visitor: IVisitor): Promise<IVisitor>;
 
-    getRoomByVisitor(token: string): Promise<ILivechatRoom | undefined>;
+    getRoomByVisitorToken(token: string): Promise<ILivechatRoom | undefined>;
 
     createRoom(visitor: IVisitor): Promise<ILivechatRoom>;
 

@@ -38,7 +38,7 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
         return departments.length;
     }
 
-    public async getRoomByVisitor(token: string): Promise<ILivechatRoom | undefined> {
+    public async getRoomByVisitorToken(token: string): Promise<ILivechatRoom | undefined> {
         const rooms = await this.reader.readByAssociation(LiveChatCacheHandler.ASSOC_ROOM(token));
         const found = rooms.find((room: ILivechatRoom) => room.visitor.token === token);
 
@@ -51,7 +51,7 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
     }
 
     public async deleteRoom(room: ILivechatRoom): Promise<void> {
-        const r = await this.getRoomByVisitor(room.visitor.token);
+        const r = await this.getRoomByVisitorToken(room.visitor.token);
         if (r) {
             await this.writer.removeByAssociation(LiveChatCacheHandler.ASSOC_ROOM(r.visitor.token));
         }

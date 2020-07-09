@@ -57,7 +57,11 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
             new LiveChatInternalHandler({} as IModify),
         );
 
-        const room = await livechatRepo.getRoomByVisitor(visitor.token);
+        const room = await livechatRepo.getRoomByVisitorToken(visitor.token);
+        if (!room) {
+            const errorMessage = `Could not find room for visitor with token: ${visitor.token}`;
+            this.getLogger().error(errorMessage);
+        }
         await livechatRepo.closeRoom(room!);
 
         const baseUrl = await read.getEnvironmentReader().getSettings().getValueById(PUSH_BASE_URL);

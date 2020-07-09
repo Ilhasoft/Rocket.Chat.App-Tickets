@@ -45,16 +45,16 @@ export class VisitorMesssageEndpoint extends ApiEndpoint {
         );
 
         // get room from cache
-        const roomCache = await livechatRepo.getRoomByVisitor(request.query.contactUuid);
-        if (!roomCache) {
-            const errorMessage = `Could not find visitor with token: ${request.query.contactUuid}`;
+        const room = await livechatRepo.getRoomByVisitorToken(request.query.contactUuid);
+        if (!room) {
+            const errorMessage = `Could not find room for visitor with token: ${request.query.contactUuid}`;
             this.app.getLogger().error(errorMessage);
             return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: errorMessage}});
         }
 
         // TODO: Validate attachments
         const attachments = JSON.parse(request.query.attachments);
-        await livechatRepo.sendMessage(request.query.msg, attachments, roomCache);
+        await livechatRepo.sendMessage(request.query.msg, attachments, room);
 
         return this.success();
     }

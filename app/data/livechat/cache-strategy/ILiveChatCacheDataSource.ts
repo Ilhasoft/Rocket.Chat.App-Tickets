@@ -7,7 +7,7 @@ export default interface ILiveChatCacheDataSource {
 
     saveDepartments(departments: Array<Department>): Promise<number>;
 
-    getRoomByVisitor(token: string): Promise<ILivechatRoom | undefined>;
+    getRoomByVisitorToken(token: string): Promise<ILivechatRoom | undefined>;
 
     saveRoom(room: ILivechatRoom): Promise<void>;
 

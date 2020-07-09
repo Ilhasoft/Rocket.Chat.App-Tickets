@@ -38,12 +38,12 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
         return await this.remoteDataSource.createVisitor(visitor);
     }
 
-    public async getRoomByVisitor(token: string): Promise<ILivechatRoom | undefined> {
-        return await this.cacheDataSource.getRoomByVisitor(token);
+    public async getRoomByVisitorToken(token: string): Promise<ILivechatRoom | undefined> {
+        return await this.cacheDataSource.getRoomByVisitorToken(token);
     }
 
     public async createRoom(visitor: IVisitor): Promise<ILivechatRoom> {
-        const cache = await this.cacheDataSource.getRoomByVisitor(visitor.token);
+        const cache = await this.cacheDataSource.getRoomByVisitorToken(visitor.token);
         if (cache) {
             throw new AppError(`Visitor already exists`, HttpStatusCode.BAD_REQUEST);
         }
@@ -53,7 +53,7 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
     }
 
     public async closeRoom(room: ILivechatRoom): Promise<void> {
-        const cache = await this.cacheDataSource.getRoomByVisitor(room.visitor.token);
+        const cache = await this.cacheDataSource.getRoomByVisitorToken(room.visitor.token);
         if (cache) {
             await this.cacheDataSource.deleteRoom(room);
         }
