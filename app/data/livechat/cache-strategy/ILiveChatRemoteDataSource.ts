@@ -7,6 +7,6 @@ export default interface ILiveChatRemoteDataSource {
 
     createVisitor(visitor: IVisitor): Promise<IVisitor>;
 
-    createRoom(visitor: IVisitor): Promise<ILivechatRoom>;
+    createRoom(visitor: IVisitor, department: Department): Promise<ILivechatRoom>;
 
 }

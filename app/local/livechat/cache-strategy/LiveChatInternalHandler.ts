@@ -10,7 +10,11 @@ export default class LiveChatInternalHandler implements ILiveChatInternalDataSou
     ) {
     }
 
-    public async sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom) {
+    public async closeRoom(room: ILivechatRoom, comment: string): Promise<void> {
+        await this.modify.getUpdater().getLivechatUpdater().closeRoom(room, comment);
+    }
+
+    public async sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<void> {
         const livechatMessageBuilder = await this.modify.getCreator().startLivechatMessage()
             .setRoom(room)
             .setVisitor(room.visitor);
