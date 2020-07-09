@@ -1,6 +1,6 @@
 import { IHttp } from '@rocket.chat/apps-engine/definition/accessors';
+import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 import IRapidProRemoteDataSource from '../../data/rapidpro/IRapidProRemoteDataSource';
-import Visitor from '../../domain/Visitor';
 
 export default class RapidProRestApi implements IRapidProRemoteDataSource {
 
@@ -13,7 +13,7 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
         this.timeout = this.timeout < 5 ? 5 : this.timeout;
     }
 
-    public async startFlow(uuid: string, visitor: Visitor, extra: any): Promise<void> {
+    public async startFlow(uuid: string, visitor: IVisitor, extra: any): Promise<void> {
         const payload = {
             flow: uuid,
             contacts: [visitor.token],

@@ -1,5 +1,5 @@
+import { ILivechatRoom } from '@rocket.chat/apps-engine/definition/livechat';
 import Department from '../../../domain/Department';
-import Visitor from '../../../domain/Visitor';
 
 export default interface ILiveChatCacheDataSource {
 
@@ -7,10 +7,10 @@ export default interface ILiveChatCacheDataSource {
 
     saveDepartments(departments: Array<Department>): Promise<number>;
 
-    getVisitor(token: string): Promise<Visitor | undefined>;
+    getRoomByVisitorToken(token: string): Promise<ILivechatRoom | undefined>;
 
-    saveVisitor(visitor: Visitor): Promise<void>;
+    saveRoom(room: ILivechatRoom): Promise<void>;
 
-    deleteVisitor(visitor: Visitor): Promise<void>;
+    deleteRoom(room: ILivechatRoom): Promise<void>;
 
 }
