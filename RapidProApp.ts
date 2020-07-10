@@ -4,27 +4,26 @@ import {
     IEnvironmentRead,
     IHttp,
     ILogger,
+    IModify,
     IPersistence,
     IRead,
-    IConfigurationModify,
-    IModify,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import {ApiSecurity, ApiVisibility, IApi} from '@rocket.chat/apps-engine/definition/api';
 import {App} from '@rocket.chat/apps-engine/definition/App';
 import {ILivechatRoom, ILivechatRoomClosedHandler, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
 import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
+import { CheckSecretEndpoint } from './app/endpoint/check-secret/CheckSecretEndpoint';
 import {CreateRoomEndpoint} from './app/endpoint/create-room/CreateRoomEndpoint';
+import { SetCallbackEndpoint } from './app/endpoint/set-callback/SetCallbackEndpoint';
 import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
 import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
+import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveChatInternalHandler';
 import ILiveChatCredentials from './app/remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from './app/remote/livechat/cache-strategy/LiveChatRestApi';
 import RapidProRestApi from './app/remote/rapidpro/RapidProRestApi';
 import {AppSettings} from './app/settings/AppSettings';
 import { PUSH_BASE_URL, PUSH_CLOSED_FLOW, PUSH_TOKEN, REQUEST_TIMEOUT } from './app/settings/Constants';
-import { ISetting } from '@rocket.chat/apps-engine/definition/settings';
-import { SetCallbackEndpoint } from './app/endpoint/set-callback/SetCallbackEndpoint';
-import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveChatInternalHandler';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -40,6 +39,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
                 new CreateRoomEndpoint(this),
                 new VisitorMesssageEndpoint(this),
                 new SetCallbackEndpoint(this),
+                new CheckSecretEndpoint(this),
             ],
         } as IApi);
         this.getLogger().log('RapidPro App Initialized');

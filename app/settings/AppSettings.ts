@@ -1,5 +1,6 @@
 import { ISetting, SettingType} from '@rocket.chat/apps-engine/definition/settings';
 import {
+    APP_SECRET,
     PUSH_BASE_URL,
     PUSH_CLOSED_FLOW,
     PUSH_MEDIA_FLOW,
@@ -27,6 +28,14 @@ export const AppSettings: Array<ISetting> = [
         required: true,
         public: false,
         i18nLabel: 'rc_user_id',
+    },
+    {
+        id: APP_SECRET,
+        type: SettingType.STRING,
+        packageValue: '',
+        required: true,
+        public: false,
+        i18nLabel: 'app_secret',
     },
     {
         id: PUSH_BASE_URL,
