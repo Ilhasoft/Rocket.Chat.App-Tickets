@@ -12,10 +12,12 @@ export default interface ILiveChatRepository {
 
     getRoomByVisitorToken(token: string): Promise<ILivechatRoom | undefined>;
 
-    createRoom(visitor: IVisitor): Promise<ILivechatRoom>;
+    createRoom(visitor: IVisitor, department: Department): Promise<ILivechatRoom>;
 
-    closeRoom(room: ILivechatRoom): Promise<void>;
+    endpointCloseRoom(room: ILivechatRoom, comment: string): Promise<void>;
 
-    sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom);
+    eventCloseRoom(room: ILivechatRoom): Promise<void>;
+
+    sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<void>;
 
 }

@@ -14,6 +14,7 @@ import {ILivechatRoom, ILivechatRoomClosedHandler, IVisitor} from '@rocket.chat/
 import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
 import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
 import { CheckSecretEndpoint } from './app/endpoint/check-secret/CheckSecretEndpoint';
+import { CloseRoomEndpoint } from './app/endpoint/close-room/CloseRoomEndpoint';
 import {CreateRoomEndpoint} from './app/endpoint/create-room/CreateRoomEndpoint';
 import { SetCallbackEndpoint } from './app/endpoint/set-callback/SetCallbackEndpoint';
 import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
@@ -21,9 +22,7 @@ import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCa
 import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveChatInternalHandler';
 import ILiveChatCredentials from './app/remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from './app/remote/livechat/cache-strategy/LiveChatRestApi';
-import RapidProRestApi from './app/remote/rapidpro/RapidProRestApi';
 import {AppSettings} from './app/settings/AppSettings';
-import { PUSH_BASE_URL, PUSH_CLOSED_FLOW, PUSH_TOKEN, REQUEST_TIMEOUT } from './app/settings/Constants';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -38,6 +37,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
             endpoints: [
                 new CreateRoomEndpoint(this),
                 new VisitorMesssageEndpoint(this),
+                new CloseRoomEndpoint(this),
                 new SetCallbackEndpoint(this),
                 new CheckSecretEndpoint(this),
             ],
@@ -63,22 +63,11 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
         if (!room) {
             const errorMessage = `Could not find room for visitor with token: ${visitor.token}`;
             this.getLogger().error(errorMessage);
+            return;
         }
-        await livechatRepo.closeRoom(room!);
 
-        const baseUrl = await read.getEnvironmentReader().getSettings().getValueById(PUSH_BASE_URL);
-        const authToken = await read.getEnvironmentReader().getSettings().getValueById(PUSH_TOKEN);
-        const timeout = await read.getEnvironmentReader().getSettings().getValueById(REQUEST_TIMEOUT);
-        const rapidpro = new RapidProRestApi(http, baseUrl, authToken, timeout);
+        await livechatRepo.eventCloseRoom(room);
 
-        const closeTicket = await read.getEnvironmentReader().getSettings().getValueById(PUSH_CLOSED_FLOW);
-        const extra = {
-            agent: data.servedBy,
-            livechat: data,
-        };
-        // TODO: change to ticket implementation later
-        await rapidpro.startFlow(closeTicket, visitor, extra);
-        // TODO: broadcast agent message on room close
     }
 
 }

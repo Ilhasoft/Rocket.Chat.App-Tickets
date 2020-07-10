@@ -45,10 +45,11 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
             throw new AppError('Error creating visitor', res.statusCode);
         }
 
+        visitor.id = resBody['visitor']._id;
         return visitor;
     }
 
-    public async createRoom(visitor: IVisitor): Promise<ILivechatRoom> {
+    public async createRoom(visitor: IVisitor, department: Department): Promise<ILivechatRoom> {
         const payload = {token: visitor.token};
         const reqOptions = this.requestOptions();
         reqOptions['params'] = payload;
@@ -61,10 +62,12 @@ export default class LiveChatRestApi implements ILiveChatRemoteDataSource {
         }
 
         const resRoom = resBody['room'];
+        const servedBy = resRoom.servedBy;
+        servedBy.id = resRoom.servedBy._id;
         const livechatRoom = {
             visitor,
-            department: visitor.department,
-            servedBy: resRoom.servedBy,
+            department,
+            servedBy,
             isWaitingResponse: resRoom.waitingResponse,
             isOpen: resRoom.open,
             type: resRoom.t,

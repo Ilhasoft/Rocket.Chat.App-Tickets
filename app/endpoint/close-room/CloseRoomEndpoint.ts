@@ -1,7 +1,6 @@
 import {HttpStatusCode, IHttp, IModify, IPersistence, IRead} from '@rocket.chat/apps-engine/definition/accessors';
 import {ApiEndpoint, IApiEndpointInfo, IApiRequest} from '@rocket.chat/apps-engine/definition/api';
 import {IApiResponseJSON} from '@rocket.chat/apps-engine/definition/api/IResponse';
-import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
 import AppError from '../../domain/AppError';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
@@ -9,10 +8,10 @@ import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveCha
 import ILiveChatCredentials from '../../remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from '../../remote/livechat/cache-strategy/LiveChatRestApi';
 import { RC_ACCESS_TOKEN, RC_SERVER_URL, RC_USER_ID, REQUEST_TIMEOUT } from '../../settings/Constants';
-import validateRequest from './ValidateCreateRoomRequest';
+import validateRequest from './ValidateCloseRoomRequest';
 
-export class CreateRoomEndpoint extends ApiEndpoint {
-    public path = 'create-room';
+export class CloseRoomEndpoint extends ApiEndpoint {
+    public path = 'close-room';
 
     public async post(
         request: IApiRequest,
@@ -31,7 +30,6 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMessage}});
         }
 
-        // Constants initialization
         const baseUrl: string = await read.getEnvironmentReader().getServerSettings().getValueById(RC_SERVER_URL);
         const timeout: number = await read.getEnvironmentReader().getSettings().getValueById(REQUEST_TIMEOUT);
         const credentials: ILiveChatCredentials = {
@@ -46,21 +44,15 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             new LiveChatInternalHandler(modify),
         );
 
-        // Check if department is a valid one
-        const departmentName = request.content.visitor.department;
-        const department = await livechatRepo.getDepartmentByName(departmentName);
-        if (!department) {
-            const errorMessage = `Could not find department with name: ${departmentName}`;
+        const room = await livechatRepo.getRoomByVisitorToken(request.content.contactUuid);
+        if (!room) {
+            const errorMessage = `Could not find room for visitor with token: ${request.content.contactUuid}`;
             this.app.getLogger().error(errorMessage);
             return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: errorMessage}});
         }
 
-        // Execute visitor and room creation
         try {
-            const visitor = request.content.visitor as IVisitor;
-            visitor.token = request.content.visitor.contactUuid;
-            const createdVisitor = await livechatRepo.createVisitor(visitor);
-            await livechatRepo.createRoom(createdVisitor, department);
+            await livechatRepo.endpointCloseRoom(room, request.content.comment);
         } catch (e) {
             this.app.getLogger().error(e);
             if (e.constructor.name === AppError.name) {
@@ -70,7 +62,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
         }
 
-        return this.json({status: HttpStatusCode.CREATED});
+        return this.success();
     }
 
 }

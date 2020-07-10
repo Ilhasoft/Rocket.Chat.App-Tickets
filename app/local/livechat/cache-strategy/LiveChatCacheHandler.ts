@@ -46,7 +46,6 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
     }
 
     public async saveRoom(room: ILivechatRoom): Promise<void> {
-        console.log('SAVE ROOM: ', room);
         await this.writer.createWithAssociation(room, LiveChatCacheHandler.ASSOC_ROOM(room.visitor.token));
     }
 
