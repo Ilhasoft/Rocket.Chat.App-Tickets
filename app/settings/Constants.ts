@@ -10,3 +10,7 @@ export const PUSH_CLOSED_FLOW = 'push_closed_flow';
 export const PUSH_MEDIA_FLOW  = 'push_media_flow';
 
 export const REQUEST_TIMEOUT = 'request_timeout';
+
+export const CALLBACK_URL_PERSISTENCE = 'callback_url_persistence';
+
+export const APP_SECRET = 'app_secret';

@@ -13,8 +13,10 @@ import {App} from '@rocket.chat/apps-engine/definition/App';
 import {ILivechatRoom, ILivechatRoomClosedHandler, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
 import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
+import { CheckSecretEndpoint } from './app/endpoint/check-secret/CheckSecretEndpoint';
 import { CloseRoomEndpoint } from './app/endpoint/close-room/CloseRoomEndpoint';
 import {CreateRoomEndpoint} from './app/endpoint/create-room/CreateRoomEndpoint';
+import { SetCallbackEndpoint } from './app/endpoint/set-callback/SetCallbackEndpoint';
 import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
 import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveChatInternalHandler';
@@ -36,6 +38,8 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
                 new CreateRoomEndpoint(this),
                 new VisitorMesssageEndpoint(this),
                 new CloseRoomEndpoint(this),
+                new SetCallbackEndpoint(this),
+                new CheckSecretEndpoint(this),
             ],
         } as IApi);
         this.getLogger().log('RapidPro App Initialized');
