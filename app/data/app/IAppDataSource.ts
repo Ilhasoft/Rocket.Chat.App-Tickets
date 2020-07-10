@@ -1,4 +1,4 @@
-export default interface IAppCacheDataSource {
+export default interface IAppDataSource {
 
     setCallbackUrl(url: string): Promise<void>;
 

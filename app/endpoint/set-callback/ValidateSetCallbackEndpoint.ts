@@ -9,7 +9,7 @@ export default function validateRequest(query: any): any {
             },
             type: 'string',
             url: true,
-        }
+        },
     };
 
     const errors = validate(query, constraints);
