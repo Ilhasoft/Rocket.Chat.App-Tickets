@@ -1,7 +1,7 @@
 import {HttpStatusCode, IHttp, IModify, IPersistence, IRead} from '@rocket.chat/apps-engine/definition/accessors';
 import {ApiEndpoint, IApiEndpointInfo, IApiRequest} from '@rocket.chat/apps-engine/definition/api';
 import {IApiResponseJSON} from '@rocket.chat/apps-engine/definition/api/IResponse';
-import AppCacheHandler from '../../local/app/cache-strategy/AppCacheHandler';
+import AppPreferences from '../../local/app/AppPreferences';
 import validateRequest from './ValidateSetCallbackEndpoint';
 
 export class SetCallbackEndpoint extends ApiEndpoint {
@@ -24,7 +24,7 @@ export class SetCallbackEndpoint extends ApiEndpoint {
             return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMessage}});
         }
 
-        const appCache = new AppCacheHandler(read.getPersistenceReader(), persis);
+        const appCache = new AppPreferences(read.getPersistenceReader(), persis);
         const callbackUrl = request.query.url;
         await appCache.setCallbackUrl(callbackUrl);
 

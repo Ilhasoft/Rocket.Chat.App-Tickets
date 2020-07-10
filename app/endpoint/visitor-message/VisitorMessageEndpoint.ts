@@ -3,14 +3,16 @@ import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-en
 import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
+import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
 import ILiveChatCredentials from '../../remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from '../../remote/livechat/cache-strategy/LiveChatRestApi';
 import { RC_ACCESS_TOKEN, RC_SERVER_URL, RC_USER_ID, REQUEST_TIMEOUT } from '../../settings/Constants';
 import validateRequest from './ValidateVisitorMessageEndpoint';
 
 export class VisitorMesssageEndpoint extends ApiEndpoint {
-    public path = 'visitor-message';
+    public path = 'message';
 
+    // TODO: change to POST when emojis are sent properly
     public async get(
         request: IApiRequest,
         endpoint: IApiEndpointInfo,
@@ -39,33 +41,20 @@ export class VisitorMesssageEndpoint extends ApiEndpoint {
         const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
             new LiveChatCacheHandler(read.getPersistenceReader(), persis),
             new LiveChatRestApi(http, baseUrl, credentials, timeout),
+            new LiveChatInternalHandler(modify),
         );
 
-        // get visitor from cache
-        const visitor = await livechatRepo.getVisitor(request.query.contactUuid);
-        if (!visitor) {
-            const errorMessage = `Could not find visitor with token: ${request.query.contactUuid}`;
-            this.app.getLogger().error(errorMessage);
-            return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: errorMessage}});
-        }
-
-        // get the visitor room
-        const room = await read.getRoomReader().getById(visitor.roomId);
+        // get room from cache
+        const room = await livechatRepo.getRoomByVisitorToken(request.query.contactUuid);
         if (!room) {
-            const errorMessage = `Could not find room with id: ${visitor.roomId}`;
+            const errorMessage = `Could not find room for visitor with token: ${request.query.contactUuid}`;
             this.app.getLogger().error(errorMessage);
             return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: errorMessage}});
         }
 
-        // build and send message
-        const sender = await read.getLivechatReader().getLivechatVisitorByToken(visitor.token);
-        const livechatMessageBuilder = await modify.getCreator().startLivechatMessage()
-            .setRoom(room)
-            .setVisitor(sender!);
-        if (request.query.msg) {
-            livechatMessageBuilder.setText(request.query.msg);
-        } // TODO: else to handle attachments
-        await modify.getCreator().finish(livechatMessageBuilder);
+        // TODO: Validate attachments
+        const attachments = JSON.parse(request.query.attachments);
+        await livechatRepo.sendMessage(request.query.msg, attachments, room);
 
         return this.success();
     }
