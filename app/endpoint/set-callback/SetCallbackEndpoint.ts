@@ -17,7 +17,7 @@ export class SetCallbackEndpoint extends ApiEndpoint {
     ): Promise<IApiResponseJSON> {
 
         // Query parameters verification
-        const errors = validateRequest(request.query);
+        const errors = validateRequest(request.content);
         if (errors) {
             const errorMessage = `Invalid query parameters...: ${JSON.stringify(errors)}`;
             this.app.getLogger().error(errorMessage);
@@ -25,7 +25,7 @@ export class SetCallbackEndpoint extends ApiEndpoint {
         }
 
         const appCache = new AppPreferences(read.getPersistenceReader(), persis);
-        const callbackUrl = request.query.url;
+        const callbackUrl = request.content.url;
         await appCache.setCallbackUrl(callbackUrl);
 
         return this.json({status: HttpStatusCode.CREATED});
