@@ -23,6 +23,10 @@ import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveCha
 import ILiveChatCredentials from './app/remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from './app/remote/livechat/cache-strategy/LiveChatRestApi';
 import {AppSettings} from './app/settings/AppSettings';
+import RapidProWebhook from './app/remote/hooks/rapidpro/RapidProWebhook';
+import { CALLBACK_URL_PERSISTENCE, APP_SECRET } from './app/settings/Constants';
+import AppPreferences from './app/local/app/AppPreferences';
+import AppError from './app/domain/AppError';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -67,6 +71,18 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
         }
 
         await livechatRepo.eventCloseRoom(room);
+
+        const appCache = new AppPreferences(read.getPersistenceReader(), persistence);
+        const callbackUrl = await appCache.getCallbackUrl();
+        if (!callbackUrl) {
+            const errorMessage = `Callback URL not defined`;
+            this.getLogger().error(errorMessage);
+            return;
+        }
+        const secret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
+        const rapidproWebhook = new RapidProWebhook(http, callbackUrl, secret);
+
+        await rapidproWebhook.onCloseRoom(data.servedBy!, data.visitor);
 
     }
 
