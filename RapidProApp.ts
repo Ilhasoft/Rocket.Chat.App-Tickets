@@ -18,15 +18,14 @@ import { CloseRoomEndpoint } from './app/endpoint/close-room/CloseRoomEndpoint';
 import {CreateRoomEndpoint} from './app/endpoint/create-room/CreateRoomEndpoint';
 import { SetCallbackEndpoint } from './app/endpoint/set-callback/SetCallbackEndpoint';
 import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
+import AppPreferences from './app/local/app/AppPreferences';
 import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveChatInternalHandler';
+import RapidProWebhook from './app/remote/hooks/rapidpro/RapidProWebhook';
 import ILiveChatCredentials from './app/remote/livechat/cache-strategy/ILiveChatCredentials';
 import LiveChatRestApi from './app/remote/livechat/cache-strategy/LiveChatRestApi';
 import {AppSettings} from './app/settings/AppSettings';
-import RapidProWebhook from './app/remote/hooks/rapidpro/RapidProWebhook';
-import { CALLBACK_URL_PERSISTENCE, APP_SECRET } from './app/settings/Constants';
-import AppPreferences from './app/local/app/AppPreferences';
-import AppError from './app/domain/AppError';
+import { APP_SECRET } from './app/settings/Constants';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
