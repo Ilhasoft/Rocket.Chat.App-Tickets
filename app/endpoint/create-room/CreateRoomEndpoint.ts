@@ -12,9 +12,9 @@ import { RC_ACCESS_TOKEN, RC_SERVER_URL, RC_USER_ID, REQUEST_TIMEOUT } from '../
 import validateRequest from './ValidateCreateRoomRequest';
 
 export class CreateRoomEndpoint extends ApiEndpoint {
-    public path = 'create-room';
+    public path = 'room';
 
-    public async post(
+    public async get(
         request: IApiRequest,
         endpoint: IApiEndpointInfo,
         read: IRead,
@@ -26,7 +26,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         // Query parameters verification
         const errors = validateRequest(request.content);
         if (errors) {
-            const errorMessage = `Invalid query parameters...: ${JSON.stringify(errors)}`;
+            const errorMessage = `Invalid body parameters...: ${JSON.stringify(errors)}`;
             this.app.getLogger().error(errorMessage);
             return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMessage}});
         }
@@ -58,9 +58,9 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         // Execute visitor and room creation
         try {
             const visitor = request.content.visitor as IVisitor;
-            visitor.token = request.content.visitor.contactUuid;
             const createdVisitor = await livechatRepo.createVisitor(visitor);
-            await livechatRepo.createRoom(createdVisitor, department);
+            const room = await livechatRepo.createRoom(createdVisitor, department);
+            return this.json({status: HttpStatusCode.CREATED, content: {id: room.id}});
         } catch (e) {
             this.app.getLogger().error(e);
             if (e.constructor.name === AppError.name) {
@@ -70,7 +70,6 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
         }
 
-        return this.json({status: HttpStatusCode.CREATED});
     }
 
 }
