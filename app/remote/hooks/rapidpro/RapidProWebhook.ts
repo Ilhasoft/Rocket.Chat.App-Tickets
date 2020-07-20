@@ -15,12 +15,12 @@ export default class RapidProWebhook implements IWebhookRepository {
         console.log('on close');
         const payload = {
             type: 'close',
+            visitor: {
+                token: visitor.token,
+            },
             data: {
                 agent: {
                     id: agent.id,
-                },
-                visitor: {
-                    token: visitor.token,
                 },
             },
         };
