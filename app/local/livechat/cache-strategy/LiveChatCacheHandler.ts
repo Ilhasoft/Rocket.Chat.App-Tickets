@@ -3,6 +3,7 @@ import { ILivechatRoom } from '@rocket.chat/apps-engine/definition/livechat';
 import {RocketChatAssociationModel, RocketChatAssociationRecord} from '@rocket.chat/apps-engine/definition/metadata';
 import ILiveChatCacheDataSource from '../../../data/livechat/cache-strategy/ILiveChatCacheDataSource';
 import Department from '../../../domain/Department';
+import Room from '../../../domain/Room';
 
 export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
 
@@ -38,21 +39,21 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
         return departments.length;
     }
 
-    public async getRoomByVisitorToken(token: string): Promise<ILivechatRoom | undefined> {
+    public async getRoomByVisitorToken(token: string): Promise<Room | undefined> {
         const rooms = await this.reader.readByAssociation(LiveChatCacheHandler.ASSOC_ROOM(token));
-        const found = rooms.find((room: ILivechatRoom) => room.visitor.token === token);
+        const found = rooms.find((room: Room) => room.room.visitor.token === token);
 
-        return found as ILivechatRoom;
+        return found as Room;
     }
 
-    public async saveRoom(room: ILivechatRoom): Promise<void> {
-        await this.writer.createWithAssociation(room, LiveChatCacheHandler.ASSOC_ROOM(room.visitor.token));
+    public async saveRoom(room: Room): Promise<void> {
+        await this.writer.createWithAssociation(room, LiveChatCacheHandler.ASSOC_ROOM(room.room.visitor.token));
     }
 
     public async deleteRoom(room: ILivechatRoom): Promise<void> {
         const r = await this.getRoomByVisitorToken(room.visitor.token);
         if (r) {
-            await this.writer.removeByAssociation(LiveChatCacheHandler.ASSOC_ROOM(r.visitor.token));
+            await this.writer.removeByAssociation(LiveChatCacheHandler.ASSOC_ROOM(room.visitor.token));
         }
     }
 

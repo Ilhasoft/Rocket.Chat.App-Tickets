@@ -50,7 +50,12 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         try {
             const visitor = request.content.visitor as IVisitor;
             const createdVisitor = await livechatRepo.createVisitor(visitor);
-            const room = await livechatRepo.createRoom(createdVisitor.visitor, createdVisitor.department);
+            const room = await livechatRepo.createRoom(
+                request.content.ticketId,
+                request.content.visitor.contactUuid,
+                createdVisitor.visitor,
+                createdVisitor.department,
+            );
             return this.json({status: HttpStatusCode.CREATED, content: {id: room.id}});
         } catch (e) {
             this.app.getLogger().error(e);

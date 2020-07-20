@@ -15,7 +15,7 @@ export default class LiveChatInternalHandler implements ILiveChatInternalDataSou
     }
 
     public async sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<void> {
-        const livechatMessageBuilder = await this.modify.getCreator().startLivechatMessage()
+        const livechatMessageBuilder = this.modify.getCreator().startLivechatMessage()
             .setRoom(room)
             .setVisitor(room.visitor);
         if (text) {

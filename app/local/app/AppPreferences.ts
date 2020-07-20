@@ -22,7 +22,9 @@ export default class AppPreferences implements IAppDataSource {
     }
     public async getCallbackUrl(): Promise<string | undefined> {
         const callbackUrl = await this.reader.readByAssociation(AppPreferences.ASSOC_CALLBACK_URL);
-
+        if (!callbackUrl[0]) {
+            return undefined;
+        }
         return (callbackUrl[0] as any).url;
     }
 

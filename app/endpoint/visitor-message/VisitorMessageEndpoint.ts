@@ -53,8 +53,8 @@ export class VisitorMesssageEndpoint extends ApiEndpoint {
         }
 
         // TODO: Validate attachments
-        const attachments = JSON.parse(request.content.attachments);
-        await livechatRepo.sendMessage(request.content.msg, attachments, room);
+        // const attachments = JSON.parse(request.content.attachments);
+        await livechatRepo.sendMessage(request.content.text, [], room.room);
 
         return this.success();
     }

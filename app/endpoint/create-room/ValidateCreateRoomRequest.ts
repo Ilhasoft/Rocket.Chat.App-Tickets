@@ -27,6 +27,12 @@ export default function validateRequest(query: any): any {
                 allowEmpty: false,
             },
             type: 'string',
+        },
+        'visitor.contactUuid': {
+            presence: {
+                allowEmpty: false,
+            },
+            type: 'string',
             format: {
                 pattern: UUID_FORMAT,
             },
