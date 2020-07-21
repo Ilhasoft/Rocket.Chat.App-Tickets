@@ -16,7 +16,7 @@ import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strat
 import { CheckSecretEndpoint } from './app/endpoint/check-secret/CheckSecretEndpoint';
 import { CloseRoomEndpoint } from './app/endpoint/close-room/CloseRoomEndpoint';
 import {CreateRoomEndpoint} from './app/endpoint/create-room/CreateRoomEndpoint';
-import { SetCallbackEndpoint } from './app/endpoint/set-callback/SetCallbackEndpoint';
+import { SettingsEndpoint } from './app/endpoint/set-callback/SettingsEndpoint';
 import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
 import AppPreferences from './app/local/app/AppPreferences';
 import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
@@ -41,7 +41,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
                 new CreateRoomEndpoint(this),
                 new VisitorMesssageEndpoint(this),
                 new CloseRoomEndpoint(this),
-                new SetCallbackEndpoint(this),
+                new SettingsEndpoint(this),
                 new CheckSecretEndpoint(this),
             ],
         } as IApi);
