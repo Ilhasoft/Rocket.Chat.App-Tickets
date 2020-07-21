@@ -22,6 +22,12 @@ export default class LiveChatInternalHandler implements ILiveChatInternalDataSou
         return room;
     }
 
+    public async createVisitor(visitor: IVisitor): Promise<IVisitor> {
+        const id = await this.modify.getCreator().getLivechatCreator().createVisitor(visitor);
+        visitor.id = id;
+        return visitor;
+    }
+
     public async getDepartmentByName(name: string): Promise<Department | undefined> {
         const department = await this.livechatReader.getLivechatDepartmentByIdOrName(name);
         return department as Department;

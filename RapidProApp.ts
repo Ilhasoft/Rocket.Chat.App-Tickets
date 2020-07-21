@@ -22,8 +22,6 @@ import AppPreferences from './app/local/app/AppPreferences';
 import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveChatInternalHandler';
 import RapidProWebhook from './app/remote/hooks/rapidpro/RapidProWebhook';
-import ILiveChatCredentials from './app/remote/livechat/cache-strategy/ILiveChatCredentials';
-import LiveChatRestApi from './app/remote/livechat/cache-strategy/LiveChatRestApi';
 import {AppSettings} from './app/settings/AppSettings';
 import { APP_SECRET } from './app/settings/Constants';
 
@@ -58,7 +56,6 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
 
         const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
             new LiveChatCacheHandler(read.getPersistenceReader(), persistence),
-            new LiveChatRestApi(http, '', {} as ILiveChatCredentials, 0),
             new LiveChatInternalHandler({} as IModify, read.getLivechatReader()),
         );
 

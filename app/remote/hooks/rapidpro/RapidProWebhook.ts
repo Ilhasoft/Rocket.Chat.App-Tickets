@@ -1,6 +1,4 @@
 import { IHttp } from '@rocket.chat/apps-engine/definition/accessors';
-import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
-import { IUser } from '@rocket.chat/apps-engine/definition/users';
 import IWebhookRepository from '../../../data/hooks/rapidpro/IWebhookRepository';
 import Room from '../../../domain/Room';
 

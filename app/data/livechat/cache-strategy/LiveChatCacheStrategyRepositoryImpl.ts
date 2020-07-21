@@ -8,13 +8,11 @@ import Visitor from '../../../domain/Visitor';
 import ILiveChatRepository from '../ILiveChatRepository';
 import ILiveChatCacheDataSource from './ILiveChatCacheDataSource';
 import ILiveChatInternalDataSource from './ILiveChatInternalDataSource';
-import ILiveChatRemoteDataSource from './ILiveChatRemoteDataSource';
 
 export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRepository {
 
     constructor(
         private readonly cacheDataSource: ILiveChatCacheDataSource,
-        private readonly remoteDataSource: ILiveChatRemoteDataSource,
         private readonly internalDataSource: ILiveChatInternalDataSource,
     ) {
     }
@@ -34,7 +32,7 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
             }
             visitor.department = department.id;
         }
-        const v = await this.remoteDataSource.createVisitor(visitor);
+        const v = await this.internalDataSource.createVisitor(visitor);
         return {
             visitor: v,
             department,
