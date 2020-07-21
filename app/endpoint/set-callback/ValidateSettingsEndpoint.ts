@@ -3,7 +3,12 @@ import {validate} from '../../lib/validatejs/0_13_1/validate';
 export default function validateRequest(query: any): any {
 
     const constraints = {
-        url: {
+        'webhook': {
+            presence: {
+                allowEmpty: false,
+            },
+        },
+        'webhook.url': {
             presence: {
                 allowEmpty: false,
             },

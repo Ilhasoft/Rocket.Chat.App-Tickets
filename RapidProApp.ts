@@ -59,7 +59,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
         const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
             new LiveChatCacheHandler(read.getPersistenceReader(), persistence),
             new LiveChatRestApi(http, '', {} as ILiveChatCredentials, 0),
-            new LiveChatInternalHandler({} as IModify),
+            new LiveChatInternalHandler({} as IModify, read.getLivechatReader()),
         );
 
         const room = await livechatRepo.getRoomByVisitorToken(visitor.token);

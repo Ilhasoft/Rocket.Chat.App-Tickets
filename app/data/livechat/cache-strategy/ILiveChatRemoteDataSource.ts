@@ -3,10 +3,8 @@ import Department from '../../../domain/Department';
 
 export default interface ILiveChatRemoteDataSource {
 
-    getDepartments(): Promise<Array<Department>>;
-
     createVisitor(visitor: IVisitor): Promise<IVisitor>;
 
-    createRoom(visitor: IVisitor, department?: Department): Promise<ILivechatRoom>;
+    createRoom(visitor: IVisitor): Promise<ILivechatRoom>;
 
 }

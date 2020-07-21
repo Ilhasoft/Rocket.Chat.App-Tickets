@@ -43,18 +43,18 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
             new LiveChatCacheHandler(read.getPersistenceReader(), persis),
             new LiveChatRestApi(http, baseUrl, credentials, timeout),
-            new LiveChatInternalHandler(modify),
+            new LiveChatInternalHandler(modify, read.getLivechatReader()),
         );
 
         // Execute visitor and room creation
         try {
             const visitor = request.content.visitor as IVisitor;
+            visitor.username = visitor.name;
             const createdVisitor = await livechatRepo.createVisitor(visitor);
             const room = await livechatRepo.createRoom(
                 request.content.ticketId,
                 request.content.visitor.contactUuid,
                 createdVisitor.visitor,
-                createdVisitor.department,
             );
             return this.json({status: HttpStatusCode.CREATED, content: {id: room.id}});
         } catch (e) {

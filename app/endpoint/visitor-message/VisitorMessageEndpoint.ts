@@ -41,7 +41,7 @@ export class VisitorMesssageEndpoint extends ApiEndpoint {
         const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
             new LiveChatCacheHandler(read.getPersistenceReader(), persis),
             new LiveChatRestApi(http, baseUrl, credentials, timeout),
-            new LiveChatInternalHandler(modify),
+            new LiveChatInternalHandler(modify, read.getLivechatReader()),
         );
 
         // get room from cache

@@ -6,15 +6,13 @@ import Visitor from '../../domain/Visitor';
 
 export default interface ILiveChatRepository {
 
-    getDepartments(): Promise<Array<Department>>;
-
     getDepartmentByName(name: string): Promise<Department | undefined>;
 
     createVisitor(visitor: IVisitor): Promise<Visitor>;
 
     getRoomByVisitorToken(token: string): Promise<Room | undefined>;
 
-    createRoom(ticketId: string, contactuuid: string, visitor: IVisitor, department?: Department): Promise<ILivechatRoom>;
+    createRoom(ticketId: string, contactuuid: string, visitor: IVisitor): Promise<ILivechatRoom>;
 
     endpointCloseRoom(visitorToken: string, comment: string): Promise<void>;
 
