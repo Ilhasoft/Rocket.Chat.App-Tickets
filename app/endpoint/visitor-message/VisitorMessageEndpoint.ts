@@ -10,10 +10,10 @@ import { RC_ACCESS_TOKEN, RC_SERVER_URL, RC_USER_ID, REQUEST_TIMEOUT } from '../
 import validateRequest from './ValidateVisitorMessageEndpoint';
 
 export class VisitorMesssageEndpoint extends ApiEndpoint {
-    public path = 'message';
+    public path = 'visitor-message';
 
     // TODO: change to POST when emojis are sent properly
-    public async get(
+    public async post(
         request: IApiRequest,
         endpoint: IApiEndpointInfo,
         read: IRead,
@@ -23,9 +23,9 @@ export class VisitorMesssageEndpoint extends ApiEndpoint {
     ): Promise<IApiResponseJSON> {
 
         // Query parameters verification
-        const errors = validateRequest(request.query);
+        const errors = validateRequest(request.content);
         if (errors) {
-            const errorMessage = `Invalid query parameters...: ${JSON.stringify(errors)}`;
+            const errorMessage = `Invalid content parameters...: ${JSON.stringify(errors)}`;
             this.app.getLogger().error(errorMessage);
             return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMessage}});
         }
@@ -45,16 +45,16 @@ export class VisitorMesssageEndpoint extends ApiEndpoint {
         );
 
         // get room from cache
-        const room = await livechatRepo.getRoomByVisitorToken(request.query.contactUuid);
+        const room = await livechatRepo.getRoomByVisitorToken(request.content.visitor.token);
         if (!room) {
-            const errorMessage = `Could not find room for visitor with token: ${request.query.contactUuid}`;
+            const errorMessage = `Could not find room for visitor with token: ${request.content.visitor.token}`;
             this.app.getLogger().error(errorMessage);
             return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: errorMessage}});
         }
 
         // TODO: Validate attachments
-        const attachments = JSON.parse(request.query.attachments);
-        await livechatRepo.sendMessage(request.query.msg, attachments, room);
+        // const attachments = JSON.parse(request.content.attachments);
+        await livechatRepo.sendMessage(request.content.text, [], room.room);
 
         return this.success();
     }

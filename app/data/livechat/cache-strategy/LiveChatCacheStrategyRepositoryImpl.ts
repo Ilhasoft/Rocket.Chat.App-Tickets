@@ -3,6 +3,8 @@ import { ILivechatRoom, IVisitor } from '@rocket.chat/apps-engine/definition/liv
 import { IMessageAttachment } from '@rocket.chat/apps-engine/definition/messages';
 import AppError from '../../../domain/AppError';
 import Department from '../../../domain/Department';
+import Room from '../../../domain/Room';
+import Visitor from '../../../domain/Visitor';
 import ILiveChatRepository from '../ILiveChatRepository';
 import ILiveChatCacheDataSource from './ILiveChatCacheDataSource';
 import ILiveChatInternalDataSource from './ILiveChatInternalDataSource';
@@ -34,29 +36,42 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
         return departments.find((d) => d.name === name);
     }
 
-    public async createVisitor(visitor: IVisitor): Promise<IVisitor> {
-        return await this.remoteDataSource.createVisitor(visitor);
+    public async createVisitor(visitor: IVisitor): Promise<Visitor> {
+        // Check if department is a valid one
+        let department: Department | undefined;
+        if (visitor.department) {
+            department = await this.getDepartmentByName(visitor.department);
+            if (!department) {
+                throw new AppError(`Could not find department with name: ${visitor.department}`, HttpStatusCode.BAD_REQUEST);
+            }
+        }
+        const v = await this.remoteDataSource.createVisitor(visitor);
+        return {
+            visitor: v,
+            department,
+        } as Visitor;
     }
 
-    public async getRoomByVisitorToken(token: string): Promise<ILivechatRoom | undefined> {
+    public async getRoomByVisitorToken(token: string): Promise<Room | undefined> {
         return await this.cacheDataSource.getRoomByVisitorToken(token);
     }
 
-    public async createRoom(visitor: IVisitor, department: Department): Promise<ILivechatRoom> {
+    public async createRoom(ticketId: string, contactUuid: string, visitor: IVisitor, department?: Department): Promise<ILivechatRoom> {
         const cache = await this.cacheDataSource.getRoomByVisitorToken(visitor.token);
         if (cache) {
             throw new AppError(`Visitor already exists`, HttpStatusCode.BAD_REQUEST);
         }
         const room = await this.remoteDataSource.createRoom(visitor, department);
-        await this.cacheDataSource.saveRoom(room);
+        await this.cacheDataSource.saveRoom({ticketId, contactUuid, room} as Room);
         return room;
     }
 
-    public async endpointCloseRoom(room: ILivechatRoom, comment: string): Promise<void> {
-        const cache = await this.cacheDataSource.getRoomByVisitorToken(room.visitor.token);
-        if (cache) {
-            await this.internalDataSource.closeRoom(room, comment);
+    public async endpointCloseRoom(visitorToken: string, comment: string): Promise<void> {
+        const cache = await this.cacheDataSource.getRoomByVisitorToken(visitorToken);
+        if (!cache) {
+            throw new AppError(`Could not find a room for the visitor with token: ${visitorToken}`, HttpStatusCode.BAD_REQUEST);
         }
+        await this.internalDataSource.closeRoom(cache.room, comment);
     }
 
     public async eventCloseRoom(room: ILivechatRoom): Promise<void> {

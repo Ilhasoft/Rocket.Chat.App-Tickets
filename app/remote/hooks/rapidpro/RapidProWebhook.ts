@@ -2,6 +2,7 @@ import { IHttp } from '@rocket.chat/apps-engine/definition/accessors';
 import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
 import IWebhookRepository from '../../../data/hooks/rapidpro/IWebhookRepository';
+import Room from '../../../domain/Room';
 
 export default class RapidProWebhook implements IWebhookRepository {
 
@@ -11,16 +12,16 @@ export default class RapidProWebhook implements IWebhookRepository {
         private readonly secret: string,
     ) {}
 
-    public async onCloseRoom(agent: IUser, visitor: IVisitor): Promise<void> {
-        console.log('on close');
+    public async onCloseRoom(room: Room): Promise<void> {
         const payload = {
-            type: 'close',
+            type: 'close-room',
+            ticketId: room.ticketId,
+            visitor: {
+                token: room.room.visitor.token,
+            },
             data: {
                 agent: {
-                    id: agent.id,
-                },
-                visitor: {
-                    token: visitor.token,
+                    id: room.room.servedBy!.id,
                 },
             },
         };

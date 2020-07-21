@@ -46,20 +46,16 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             new LiveChatInternalHandler(modify),
         );
 
-        // Check if department is a valid one
-        const departmentName = request.content.visitor.department;
-        const department = await livechatRepo.getDepartmentByName(departmentName);
-        if (!department) {
-            const errorMessage = `Could not find department with name: ${departmentName}`;
-            this.app.getLogger().error(errorMessage);
-            return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: errorMessage}});
-        }
-
         // Execute visitor and room creation
         try {
             const visitor = request.content.visitor as IVisitor;
             const createdVisitor = await livechatRepo.createVisitor(visitor);
-            const room = await livechatRepo.createRoom(createdVisitor, department);
+            const room = await livechatRepo.createRoom(
+                request.content.ticketId,
+                request.content.visitor.contactUuid,
+                createdVisitor.visitor,
+                createdVisitor.department,
+            );
             return this.json({status: HttpStatusCode.CREATED, content: {id: room.id}});
         } catch (e) {
             this.app.getLogger().error(e);

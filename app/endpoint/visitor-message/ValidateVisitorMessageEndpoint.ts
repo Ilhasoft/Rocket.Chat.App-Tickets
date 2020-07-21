@@ -1,24 +1,30 @@
 import {validate} from '../../lib/validatejs/0_13_1/validate';
 
-const contactUuidFormat = `[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}`;
-
 export default function validateRequest(query: any): any {
 
     const constraints = {
-        'contactUuid': {
+        'visitor': {
+            presence: {
+                allowEmpty: false,
+            },
+        },
+        'visitor.token': {
             presence: {
                 allowEmpty: false,
             },
             type: 'string',
-            format: {
-                pattern: contactUuidFormat,
-            },
         },
-        'msg': {
+        'text': {
             presence: {
                 allowEmpty: true,
             },
             type: 'string',
+        },
+        'attachments': {
+            presence: {
+                allowEmpty: true,
+            },
+            type: 'array',
         },
     };
 

@@ -69,7 +69,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
             return;
         }
 
-        await livechatRepo.eventCloseRoom(room);
+        await livechatRepo.eventCloseRoom(room.room);
 
         const appCache = new AppPreferences(read.getPersistenceReader(), persistence);
         const callbackUrl = await appCache.getCallbackUrl();
@@ -81,7 +81,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
         const secret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
         const rapidproWebhook = new RapidProWebhook(http, callbackUrl, secret);
 
-        await rapidproWebhook.onCloseRoom(data.servedBy!, data.visitor);
+        await rapidproWebhook.onCloseRoom(room);
 
     }
 

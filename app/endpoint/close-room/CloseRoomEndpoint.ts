@@ -11,7 +11,7 @@ import { RC_ACCESS_TOKEN, RC_SERVER_URL, RC_USER_ID, REQUEST_TIMEOUT } from '../
 import validateRequest from './ValidateCloseRoomRequest';
 
 export class CloseRoomEndpoint extends ApiEndpoint {
-    public path = 'close-room';
+    public path = 'room.close';
 
     public async post(
         request: IApiRequest,
@@ -44,15 +44,8 @@ export class CloseRoomEndpoint extends ApiEndpoint {
             new LiveChatInternalHandler(modify),
         );
 
-        const room = await livechatRepo.getRoomByVisitorToken(request.content.contactUuid);
-        if (!room) {
-            const errorMessage = `Could not find room for visitor with token: ${request.content.contactUuid}`;
-            this.app.getLogger().error(errorMessage);
-            return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: errorMessage}});
-        }
-
         try {
-            await livechatRepo.endpointCloseRoom(room, request.content.comment);
+            await livechatRepo.endpointCloseRoom(request.content.visitor.token, request.content.comment);
         } catch (e) {
             this.app.getLogger().error(e);
             if (e.constructor.name === AppError.name) {

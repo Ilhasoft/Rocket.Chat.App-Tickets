@@ -1,8 +1,7 @@
-import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
-import { IUser } from '@rocket.chat/apps-engine/definition/users';
+import Room from '../../../domain/Room';
 
 export default interface IWebhookRepository {
 
-   onCloseRoom(agent: IUser, visitor: IVisitor): Promise<void>;
+   onCloseRoom(room: Room): Promise<void>;
 
 }
