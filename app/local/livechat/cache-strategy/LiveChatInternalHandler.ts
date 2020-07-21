@@ -2,6 +2,7 @@ import { ILivechatRead, IModify } from '@rocket.chat/apps-engine/definition/acce
 import { ILivechatRoom, IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 import { IMessageAttachment } from '@rocket.chat/apps-engine/definition/messages';
 import { IUser } from '@rocket.chat/apps-engine/definition/users';
+
 import ILiveChatInternalDataSource from '../../../data/livechat/cache-strategy/ILiveChatInternalDataSource';
 import Department from '../../../domain/Department';
 

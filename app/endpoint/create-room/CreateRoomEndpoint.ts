@@ -1,13 +1,12 @@
-import {HttpStatusCode, IHttp, IModify, IPersistence, IRead} from '@rocket.chat/apps-engine/definition/accessors';
-import {ApiEndpoint, IApiEndpointInfo, IApiRequest} from '@rocket.chat/apps-engine/definition/api';
-import {IApiResponseJSON} from '@rocket.chat/apps-engine/definition/api/IResponse';
+import { HttpStatusCode, IHttp, IModify, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
+import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-engine/definition/api';
+import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
+
 import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
 import AppError from '../../domain/AppError';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
-import ILiveChatCredentials from '../../remote/livechat/cache-strategy/ILiveChatCredentials';
-import { RC_SERVER_URL, REQUEST_TIMEOUT } from '../../settings/Constants';
 import validateRequest from './ValidateCreateRoomRequest';
 
 export class CreateRoomEndpoint extends ApiEndpoint {

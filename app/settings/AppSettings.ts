@@ -1,8 +1,6 @@
-import { ISetting, SettingType} from '@rocket.chat/apps-engine/definition/settings';
-import {
-    APP_SECRET,
-    REQUEST_TIMEOUT,
-} from './Constants';
+import { ISetting, SettingType } from '@rocket.chat/apps-engine/definition/settings';
+
+import { APP_SECRET, REQUEST_TIMEOUT } from './Constants';
 
 export const AppSettings: Array<ISetting> = [
     {

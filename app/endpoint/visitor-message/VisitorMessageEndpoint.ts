@@ -1,11 +1,10 @@
 import { HttpStatusCode, IHttp, IModify, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-engine/definition/api';
 import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
+
 import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
-import ILiveChatCredentials from '../../remote/livechat/cache-strategy/ILiveChatCredentials';
-import { RC_SERVER_URL, REQUEST_TIMEOUT } from '../../settings/Constants';
 import validateRequest from './ValidateVisitorMessageEndpoint';
 
 export class VisitorMesssageEndpoint extends ApiEndpoint {

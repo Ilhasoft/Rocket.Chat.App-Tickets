@@ -1,6 +1,7 @@
 import { HttpStatusCode } from '@rocket.chat/apps-engine/definition/accessors';
 import { ILivechatRoom, IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 import { IMessageAttachment } from '@rocket.chat/apps-engine/definition/messages';
+
 import AppError from '../../../domain/AppError';
 import Department from '../../../domain/Department';
 import Room from '../../../domain/Room';

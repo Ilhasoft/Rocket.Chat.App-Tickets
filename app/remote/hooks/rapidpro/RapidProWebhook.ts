@@ -1,4 +1,5 @@
 import { IHttp } from '@rocket.chat/apps-engine/definition/accessors';
+
 import IWebhookRepository from '../../../data/hooks/rapidpro/IWebhookRepository';
 import Room from '../../../domain/Room';
 

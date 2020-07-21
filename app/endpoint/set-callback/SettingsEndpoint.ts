@@ -1,6 +1,7 @@
-import {HttpStatusCode, IHttp, IModify, IPersistence, IRead} from '@rocket.chat/apps-engine/definition/accessors';
-import {ApiEndpoint, IApiEndpointInfo, IApiRequest} from '@rocket.chat/apps-engine/definition/api';
-import {IApiResponseJSON} from '@rocket.chat/apps-engine/definition/api/IResponse';
+import { HttpStatusCode, IHttp, IModify, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
+import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-engine/definition/api';
+import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
+
 import AppPreferences from '../../local/app/AppPreferences';
 import validateRequest from './ValidateSettingsEndpoint';
 
