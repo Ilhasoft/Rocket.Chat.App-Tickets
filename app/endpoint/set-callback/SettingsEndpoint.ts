@@ -1,11 +1,12 @@
-import {HttpStatusCode, IHttp, IModify, IPersistence, IRead} from '@rocket.chat/apps-engine/definition/accessors';
-import {ApiEndpoint, IApiEndpointInfo, IApiRequest} from '@rocket.chat/apps-engine/definition/api';
-import {IApiResponseJSON} from '@rocket.chat/apps-engine/definition/api/IResponse';
-import AppPreferences from '../../local/app/AppPreferences';
-import validateRequest from './ValidateSetCallbackEndpoint';
+import { HttpStatusCode, IHttp, IModify, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
+import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-engine/definition/api';
+import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 
-export class SetCallbackEndpoint extends ApiEndpoint {
-    public path = 'setCallback';
+import AppPreferences from '../../local/app/AppPreferences';
+import validateRequest from './ValidateSettingsEndpoint';
+
+export class SettingsEndpoint extends ApiEndpoint {
+    public path = 'settings';
 
     public async put(
         request: IApiRequest,
@@ -25,7 +26,7 @@ export class SetCallbackEndpoint extends ApiEndpoint {
         }
 
         const appCache = new AppPreferences(read.getPersistenceReader(), persis);
-        const callbackUrl = request.content.url;
+        const callbackUrl = request.content.webhook.url;
         await appCache.setCallbackUrl(callbackUrl);
 
         return this.json({status: HttpStatusCode.CREATED});

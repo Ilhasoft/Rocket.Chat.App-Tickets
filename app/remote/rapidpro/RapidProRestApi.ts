@@ -1,5 +1,6 @@
 import { IHttp } from '@rocket.chat/apps-engine/definition/accessors';
 import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
+
 import IRapidProRemoteDataSource from '../../data/rapidpro/IRapidProRemoteDataSource';
 
 export default class RapidProRestApi implements IRapidProRemoteDataSource {

@@ -1,4 +1,4 @@
-import {validate} from '../../lib/validatejs/0_13_1/validate';
+import { validate } from '../../lib/validatejs/0_13_1/validate';
 
 export default function validateRequest(query: any): any {
 

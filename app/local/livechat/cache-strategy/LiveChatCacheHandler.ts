@@ -1,6 +1,7 @@
-import {IPersistence, IPersistenceRead} from '@rocket.chat/apps-engine/definition/accessors';
+import { IPersistence, IPersistenceRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { ILivechatRoom } from '@rocket.chat/apps-engine/definition/livechat';
-import {RocketChatAssociationModel, RocketChatAssociationRecord} from '@rocket.chat/apps-engine/definition/metadata';
+import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
+
 import ILiveChatCacheDataSource from '../../../data/livechat/cache-strategy/ILiveChatCacheDataSource';
 import Department from '../../../domain/Department';
 import Room from '../../../domain/Room';

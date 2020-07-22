@@ -8,23 +8,22 @@ import {
     IPersistence,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import {ApiSecurity, ApiVisibility, IApi} from '@rocket.chat/apps-engine/definition/api';
-import {App} from '@rocket.chat/apps-engine/definition/App';
-import {ILivechatRoom, ILivechatRoomClosedHandler, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
-import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
+import { ApiSecurity, ApiVisibility, IApi } from '@rocket.chat/apps-engine/definition/api';
+import { App } from '@rocket.chat/apps-engine/definition/App';
+import { ILivechatRoom, ILivechatRoomClosedHandler, IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
+import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
+
 import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
 import { CheckSecretEndpoint } from './app/endpoint/check-secret/CheckSecretEndpoint';
 import { CloseRoomEndpoint } from './app/endpoint/close-room/CloseRoomEndpoint';
-import {CreateRoomEndpoint} from './app/endpoint/create-room/CreateRoomEndpoint';
-import { SetCallbackEndpoint } from './app/endpoint/set-callback/SetCallbackEndpoint';
+import { CreateRoomEndpoint } from './app/endpoint/create-room/CreateRoomEndpoint';
+import { SettingsEndpoint } from './app/endpoint/set-callback/SettingsEndpoint';
 import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
 import AppPreferences from './app/local/app/AppPreferences';
 import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveChatInternalHandler';
 import RapidProWebhook from './app/remote/hooks/rapidpro/RapidProWebhook';
-import ILiveChatCredentials from './app/remote/livechat/cache-strategy/ILiveChatCredentials';
-import LiveChatRestApi from './app/remote/livechat/cache-strategy/LiveChatRestApi';
-import {AppSettings} from './app/settings/AppSettings';
+import { AppSettings } from './app/settings/AppSettings';
 import { APP_SECRET } from './app/settings/Constants';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler {
@@ -41,7 +40,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
                 new CreateRoomEndpoint(this),
                 new VisitorMesssageEndpoint(this),
                 new CloseRoomEndpoint(this),
-                new SetCallbackEndpoint(this),
+                new SettingsEndpoint(this),
                 new CheckSecretEndpoint(this),
             ],
         } as IApi);
@@ -58,8 +57,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler {
 
         const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
             new LiveChatCacheHandler(read.getPersistenceReader(), persistence),
-            new LiveChatRestApi(http, '', {} as ILiveChatCredentials, 0),
-            new LiveChatInternalHandler({} as IModify),
+            new LiveChatInternalHandler({} as IModify, read.getLivechatReader()),
         );
 
         const room = await livechatRepo.getRoomByVisitorToken(visitor.token);
