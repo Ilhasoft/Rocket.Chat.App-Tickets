@@ -15,4 +15,6 @@ export default interface ILiveChatInternalDataSource {
 
     getDepartmentByName(name: string): Promise<Department | undefined>;
 
+    getVisitorByToken(token: string): Promise<IVisitor | undefined>;
+
 }

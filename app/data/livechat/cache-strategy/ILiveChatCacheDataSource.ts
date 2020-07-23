@@ -15,4 +15,6 @@ export default interface ILiveChatCacheDataSource {
 
     deleteRoom(room: ILivechatRoom): Promise<void>;
 
+    getNewVisitorUsername(): Promise<string>;
+
 }

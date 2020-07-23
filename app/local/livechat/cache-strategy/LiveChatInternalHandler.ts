@@ -45,4 +45,9 @@ export default class LiveChatInternalHandler implements ILiveChatInternalDataSou
         await this.modify.getCreator().finish(livechatMessageBuilder);
     }
 
+    public async getVisitorByToken(token: string): Promise<IVisitor | undefined> {
+        const visitor = await this.livechatReader.getLivechatVisitorByToken(token);
+        return visitor;
+    }
+
 }

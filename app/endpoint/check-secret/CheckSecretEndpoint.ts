@@ -25,7 +25,7 @@ export class CheckSecretEndpoint extends ApiEndpoint {
         if (incomingSecret !== appSecret) {
             return this.json({status: HttpStatusCode.UNAUTHORIZED, content: {error: 'Configured secrets do not match'}});
         }
-        const appId = this.app.getID();
+
         return this.json({status: HttpStatusCode.NO_CONTENT});
     }
 }
