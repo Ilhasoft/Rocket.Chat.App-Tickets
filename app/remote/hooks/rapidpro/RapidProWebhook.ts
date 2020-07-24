@@ -51,10 +51,11 @@ export default class RapidProWebhook implements IWebhookRepository {
         if (attachments) {
             const formattedAttachments: { [key: string]: any } = [];
             await Promise.all(attachments.map(async (attachment) => {
-                const type = this.getAttachmentType(attachment);
+                let type = this.getAttachmentType(attachment);
                 const url = await this.buildAttachmentUrl(attachment);
                 if (type === 'document') {
                     if (url.endsWith('.pdf')) {
+                        type = type.concat('/pdf');
                         formattedAttachments.push({ type, url });
                     }
                 } else {
