@@ -38,7 +38,6 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         // Execute visitor and room creation
         try {
             const visitor = request.content.visitor as IVisitor;
-            visitor.username = visitor.name;
             const createdVisitor = await livechatRepo.createVisitor(visitor);
             const room = await livechatRepo.createRoom(
                 request.content.ticketId,

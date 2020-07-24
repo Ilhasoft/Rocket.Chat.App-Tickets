@@ -33,7 +33,14 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
             }
             visitor.department = department.id;
         }
+        const visitorExists = await this.internalDataSource.getVisitorByToken(visitor.token);
+        if (visitorExists) {
+            visitor.username = visitorExists.username;
+        } else {
+            visitor.username = await this.cacheDataSource.getNewVisitorUsername();
+        }
         const v = await this.internalDataSource.createVisitor(visitor);
+
         return {
             visitor: v,
             department,

@@ -13,6 +13,11 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
         'livechat_departments',
     );
 
+    private static readonly ASSOC_VISITOR_COUNT = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MISC,
+        'visitor_count',
+    );
+
     private static ASSOC_ROOM(visitorToken: string): RocketChatAssociationRecord {
         return new RocketChatAssociationRecord(
             RocketChatAssociationModel.MISC,
@@ -56,6 +61,20 @@ export default class LiveChatCacheHandler implements ILiveChatCacheDataSource {
         if (r) {
             await this.writer.removeByAssociation(LiveChatCacheHandler.ASSOC_ROOM(room.visitor.token));
         }
+    }
+
+    public async getNewVisitorUsername(): Promise<string> {
+        const assoc = await this.reader.readByAssociation(LiveChatCacheHandler.ASSOC_VISITOR_COUNT);
+        let count;
+        if (!assoc[0]) {
+            count = 0;
+            this.writer.createWithAssociation({count}, LiveChatCacheHandler.ASSOC_VISITOR_COUNT);
+        } else {
+            count = assoc[0]['count'];
+        }
+        count += 1;
+        await this.writer.updateByAssociation(LiveChatCacheHandler.ASSOC_VISITOR_COUNT, {count});
+        return `guest-${count}`;
     }
 
 }

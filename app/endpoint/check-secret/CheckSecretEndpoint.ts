@@ -17,13 +17,15 @@ export class CheckSecretEndpoint extends ApiEndpoint {
     ): Promise<IApiResponseJSON> {
 
         const incomingSecret = request.headers.authorization;
-        const appSecret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
+        let appSecret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
         if (!appSecret) {
-            return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unconfigured secret'}});
-        } else if (incomingSecret !== appSecret) {
-            return this.json({status: HttpStatusCode.EXPECTATION_FAILED, content: {error: 'Configured secrets do not match'}});
+            return this.json({status: HttpStatusCode.FORBIDDEN, content: {error: 'Unconfigured secret'}});
+        }
+        appSecret = `Token ${appSecret}`;
+        if (incomingSecret !== appSecret) {
+            return this.json({status: HttpStatusCode.UNAUTHORIZED, content: {error: 'Configured secrets do not match'}});
         }
 
-        return this.json({status: HttpStatusCode.OK});
+        return this.json({status: HttpStatusCode.NO_CONTENT});
     }
 }
