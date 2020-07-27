@@ -1,27 +1,27 @@
 import { HttpStatusCode, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 
+import AppError from '../domain/AppError';
 import { APP_SECRET } from '../settings/Constants';
 
-export default class HeaderValidator {
+export default class RequestHeadersValidator {
     constructor(private readonly read: IRead) {}
 
-    public async validate(headers: {[key: string]: string}): Promise<{status: HttpStatusCode, error?: string}> {
+    public async validate(headers: {[key: string]: string}) {
 
         let appSecret = await this.read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
 
         if (headers['content-type'] !== 'application/json') {
-            return {status: HttpStatusCode.BAD_REQUEST, error: 'Invalid Content-Type header'};
+            throw new AppError('Invalid Content-Type header', HttpStatusCode.BAD_REQUEST);
         }
 
         if (!appSecret) {
-            return {status: HttpStatusCode.FORBIDDEN, error: 'Unconfigured secret'};
+            throw new AppError('Unconfigured secret', HttpStatusCode.FORBIDDEN);
         }
         appSecret = `Token ${appSecret}`;
         if (headers.authorization !== appSecret) {
-            return {status: HttpStatusCode.UNAUTHORIZED, error: 'Configured secrets do not match'};
+            throw new AppError('Configured secrets do not match', HttpStatusCode.FORBIDDEN);
         }
 
-        return {status: HttpStatusCode.NO_CONTENT};
     }
 
 }

@@ -1,8 +1,9 @@
-import { IHttp, IModify, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
+import { HttpStatusCode, IHttp, IModify, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-engine/definition/api';
 import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 
-import HeaderValidator from '../../utils/HeaderValidator';
+import AppError from '../../domain/AppError';
+import RequestHeadersValidator from '../../utils/RequestHeadersValidator';
 
 export class CheckSecretEndpoint extends ApiEndpoint {
     public path = 'secret.check';
@@ -17,13 +18,18 @@ export class CheckSecretEndpoint extends ApiEndpoint {
     ): Promise<IApiResponseJSON> {
 
         // Headers validation
-        const headerValidator = new HeaderValidator(read);
-        const valid = await headerValidator.validate(request.headers);
-        if (valid.status >= 300) {
-            this.app.getLogger().error(valid.error);
-            return this.json({status: valid.status, content: {error: valid.error}});
+        try {
+            const headerValidator = new RequestHeadersValidator(read);
+            await headerValidator.validate(request.headers);
+        } catch (e) {
+            this.app.getLogger().error(e);
+            if (e.constructor.name === AppError.name) {
+                return this.json({status: e.statusCode, content: {error: e.message}});
+            }
+
+            return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
         }
 
-        return this.json({status: valid.status});
+        return this.json({status: HttpStatusCode.NO_CONTENT});
     }
 }

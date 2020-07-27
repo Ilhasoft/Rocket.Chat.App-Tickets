@@ -5,7 +5,7 @@ import Department from '../../../domain/Department';
 
 export default interface ILiveChatInternalDataSource {
 
-    sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<void>;
+    sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<string>;
 
     closeRoom(room: ILivechatRoom, comment: string): Promise<void>;
 

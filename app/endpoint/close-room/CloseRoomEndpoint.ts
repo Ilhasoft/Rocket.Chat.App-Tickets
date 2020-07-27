@@ -21,37 +21,28 @@ export class CloseRoomEndpoint extends ApiEndpoint {
         persis: IPersistence,
     ): Promise<IApiResponseJSON> {
 
-        // Headers validation
-        const headerValidator = new HeaderValidator(read);
-        const valid = await headerValidator.validate(request.headers);
-        if (valid.status >= 300) {
-            this.app.getLogger().error(valid.error);
-            return this.json({status: valid.status, content: {error: valid.error}});
-        }
-
-        // Query parameters verification
-        const errors = validateRequest(request.content);
-        if (errors) {
-            const errorMessage = `Invalid query parameters...: ${JSON.stringify(errors)}`;
-            this.app.getLogger().error(errorMessage);
-            return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMessage}});
-        }
-
-        // livechatRepo initialization
-        const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
-            new LiveChatCacheHandler(read.getPersistenceReader(), persis),
-            new LiveChatInternalHandler(modify, read.getLivechatReader()),
-        );
-
         try {
+            // Headers validation
+            const headerValidator = new HeaderValidator(read);
+            await headerValidator.validate(request.headers);
+
+            // Query parameters verification
+            validateRequest(request.content);
+
+            // livechatRepo initialization
+            const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
+                new LiveChatCacheHandler(read.getPersistenceReader(), persis),
+                new LiveChatInternalHandler(modify, read.getLivechatReader()),
+            );
+
             await livechatRepo.endpointCloseRoom(request.content.visitor.token, request.content.comment);
         } catch (e) {
             this.app.getLogger().error(e);
             if (e.constructor.name === AppError.name) {
-                return this.json({status: e.statusCode, content: {error: e.message}});
+                return this.json({ status: e.statusCode, content: { error: e.message } });
             }
 
-            return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
+            return this.json({ status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: { error: 'Unexpected error' } });
         }
 
         return this.success();

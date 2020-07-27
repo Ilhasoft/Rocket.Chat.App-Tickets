@@ -11,7 +11,7 @@ export default interface ILiveChatRepository {
 
     createVisitor(visitor: IVisitor): Promise<Visitor>;
 
-    getRoomByVisitorToken(token: string): Promise<Room | undefined>;
+    getRoomByVisitorToken(token: string): Promise<Room>;
 
     createRoom(ticketId: string, contactuuid: string, visitor: IVisitor): Promise<ILivechatRoom>;
 
@@ -19,6 +19,6 @@ export default interface ILiveChatRepository {
 
     eventCloseRoom(room: ILivechatRoom): Promise<void>;
 
-    sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<void>;
+    sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<string>;
 
 }

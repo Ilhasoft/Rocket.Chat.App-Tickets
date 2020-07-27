@@ -2,6 +2,7 @@ import { HttpStatusCode, IHttp, IModify, IPersistence, IRead } from '@rocket.cha
 import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-engine/definition/api';
 import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 
+import AppError from '../../domain/AppError';
 import AppPreferences from '../../local/app/AppPreferences';
 import HeaderValidator from '../../utils/HeaderValidator';
 import validateRequest from './ValidateSettingsEndpoint';
@@ -18,26 +19,26 @@ export class SettingsEndpoint extends ApiEndpoint {
         persis: IPersistence,
     ): Promise<IApiResponseJSON> {
 
-        // Headers validation
-        const headerValidator = new HeaderValidator(read);
-        const valid = await headerValidator.validate(request.headers);
-        if (valid.status >= 300) {
-            this.app.getLogger().error(valid.error);
-            return this.json({status: valid.status, content: {error: valid.error}});
+        try {
+            // Headers validation
+            const headerValidator = new HeaderValidator(read);
+            await headerValidator.validate(request.headers);
+
+            // Query parameters verification
+            validateRequest(request.content);
+
+            const appCache = new AppPreferences(read.getPersistenceReader(), persis);
+            const callbackUrl = request.content.webhook.url;
+            await appCache.setCallbackUrl(callbackUrl);
+
+            return this.json({status: HttpStatusCode.CREATED});
+        } catch (e) {
+            this.app.getLogger().error(e);
+            if (e.constructor.name === AppError.name) {
+                return this.json({status: e.statusCode, content: {error: e.message}});
+            }
+
+            return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
         }
-
-        // Query parameters verification
-        const errors = validateRequest(request.content);
-        if (errors) {
-            const errorMessage = `Invalid query parameters...: ${JSON.stringify(errors)}`;
-            this.app.getLogger().error(errorMessage);
-            return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMessage}});
-        }
-
-        const appCache = new AppPreferences(read.getPersistenceReader(), persis);
-        const callbackUrl = request.content.webhook.url;
-        await appCache.setCallbackUrl(callbackUrl);
-
-        return this.json({status: HttpStatusCode.CREATED});
     }
 }

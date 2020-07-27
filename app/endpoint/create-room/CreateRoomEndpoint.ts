@@ -22,30 +22,20 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         persis: IPersistence,
     ): Promise<IApiResponseJSON> {
 
-        // Headers validation
-        const headerValidator = new HeaderValidator(read);
-        const valid = await headerValidator.validate(request.headers);
-        if (valid.status >= 300) {
-            this.app.getLogger().error(valid.error);
-            return this.json({status: valid.status, content: {error: valid.error}});
-        }
-
-        // Query parameters verification
-        const errors = validateRequest(request.content);
-        if (errors) {
-            const errorMessage = `Invalid body parameters...: ${JSON.stringify(errors)}`;
-            this.app.getLogger().error(errorMessage);
-            return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMessage}});
-        }
-
-        // livechatRepo initialization
-        const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
-            new LiveChatCacheHandler(read.getPersistenceReader(), persis),
-            new LiveChatInternalHandler(modify, read.getLivechatReader()),
-        );
-
-        // Execute visitor and room creation
         try {
+            const headerValidator = new HeaderValidator(read);
+            await headerValidator.validate(request.headers);
+
+            // Query parameters verification
+            validateRequest(request.content);
+
+            // livechatRepo initialization
+            const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
+                new LiveChatCacheHandler(read.getPersistenceReader(), persis),
+                new LiveChatInternalHandler(modify, read.getLivechatReader()),
+                );
+
+            // Execute visitor and room creation
             const visitor = request.content.visitor as IVisitor;
             const createdVisitor = await livechatRepo.createVisitor(visitor);
             const room = await livechatRepo.createRoom(

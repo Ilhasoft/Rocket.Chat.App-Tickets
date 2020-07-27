@@ -47,8 +47,12 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
         } as Visitor;
     }
 
-    public async getRoomByVisitorToken(token: string): Promise<Room | undefined> {
-        return await this.cacheDataSource.getRoomByVisitorToken(token);
+    public async getRoomByVisitorToken(token: string): Promise<Room> {
+        const room = await this.cacheDataSource.getRoomByVisitorToken(token);
+        if (!room) {
+            throw new AppError(`Could not find room for visitor with token: ${token}`, HttpStatusCode.NOT_FOUND);
+        }
+        return room;
     }
 
     public async createRoom(ticketId: string, contactUuid: string, visitor: IVisitor): Promise<ILivechatRoom> {
@@ -73,8 +77,8 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
         await this.cacheDataSource.deleteRoom(room);
     }
 
-    public async sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<void> {
-        await this.internalDataSource.sendMessage(text, attachments, room);
+    public async sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<string> {
+        return await this.internalDataSource.sendMessage(text, attachments, room);
     }
 
 }
