@@ -6,6 +6,7 @@ import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strat
 import AppError from '../../domain/AppError';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
+import HeaderValidator from '../../utils/HeaderValidator';
 import validateRequest from './ValidateCloseRoomRequest';
 
 export class CloseRoomEndpoint extends ApiEndpoint {
@@ -19,6 +20,14 @@ export class CloseRoomEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence,
     ): Promise<IApiResponseJSON> {
+
+        // Headers validation
+        const headerValidator = new HeaderValidator(read);
+        const valid = await headerValidator.validate(request.headers);
+        if (valid.status >= 300) {
+            this.app.getLogger().error(valid.error);
+            return this.json({status: valid.status, content: {error: valid.error}});
+        }
 
         // Query parameters verification
         const errors = validateRequest(request.content);

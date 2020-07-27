@@ -3,6 +3,7 @@ import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-en
 import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 
 import AppPreferences from '../../local/app/AppPreferences';
+import HeaderValidator from '../../utils/HeaderValidator';
 import validateRequest from './ValidateSettingsEndpoint';
 
 export class SettingsEndpoint extends ApiEndpoint {
@@ -16,6 +17,14 @@ export class SettingsEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence,
     ): Promise<IApiResponseJSON> {
+
+        // Headers validation
+        const headerValidator = new HeaderValidator(read);
+        const valid = await headerValidator.validate(request.headers);
+        if (valid.status >= 300) {
+            this.app.getLogger().error(valid.error);
+            return this.json({status: valid.status, content: {error: valid.error}});
+        }
 
         // Query parameters verification
         const errors = validateRequest(request.content);

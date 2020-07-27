@@ -19,7 +19,7 @@ import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strat
 import { CheckSecretEndpoint } from './app/endpoint/check-secret/CheckSecretEndpoint';
 import { CloseRoomEndpoint } from './app/endpoint/close-room/CloseRoomEndpoint';
 import { CreateRoomEndpoint } from './app/endpoint/create-room/CreateRoomEndpoint';
-import { SettingsEndpoint } from './app/endpoint/set-callback/SettingsEndpoint';
+import { SettingsEndpoint } from './app/endpoint/settings/SettingsEndpoint';
 import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
 import AppPreferences from './app/local/app/AppPreferences';
 import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
