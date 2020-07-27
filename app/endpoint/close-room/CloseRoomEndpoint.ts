@@ -6,7 +6,7 @@ import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strat
 import AppError from '../../domain/AppError';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
-import HeaderValidator from '../../utils/HeaderValidator';
+import RequestHeadersValidator from '../../utils/RequestHeadersValidator';
 import validateRequest from './ValidateCloseRoomRequest';
 
 export class CloseRoomEndpoint extends ApiEndpoint {
@@ -23,8 +23,7 @@ export class CloseRoomEndpoint extends ApiEndpoint {
 
         try {
             // Headers validation
-            const headerValidator = new HeaderValidator(read);
-            await headerValidator.validate(request.headers);
+            await RequestHeadersValidator.validate(read, request.headers);
 
             // Query parameters verification
             validateRequest(request.content);

@@ -4,11 +4,10 @@ import AppError from '../domain/AppError';
 import { APP_SECRET } from '../settings/Constants';
 
 export default class RequestHeadersValidator {
-    constructor(private readonly read: IRead) {}
 
-    public async validate(headers: {[key: string]: string}) {
+    public static async validate(read: IRead, headers: {[key: string]: string}) {
 
-        let appSecret = await this.read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
+        let appSecret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
 
         if (headers['content-type'] !== 'application/json') {
             throw new AppError('Invalid Content-Type header', HttpStatusCode.BAD_REQUEST);

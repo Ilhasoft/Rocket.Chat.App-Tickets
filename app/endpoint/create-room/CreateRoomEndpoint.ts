@@ -7,7 +7,7 @@ import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strat
 import AppError from '../../domain/AppError';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
-import HeaderValidator from '../../utils/HeaderValidator';
+import RequestHeadersValidator from '../../utils/RequestHeadersValidator';
 import validateRequest from './ValidateCreateRoomRequest';
 
 export class CreateRoomEndpoint extends ApiEndpoint {
@@ -23,8 +23,8 @@ export class CreateRoomEndpoint extends ApiEndpoint {
     ): Promise<IApiResponseJSON> {
 
         try {
-            const headerValidator = new HeaderValidator(read);
-            await headerValidator.validate(request.headers);
+            // Headers validation
+            await RequestHeadersValidator.validate(read, request.headers);
 
             // Query parameters verification
             validateRequest(request.content);

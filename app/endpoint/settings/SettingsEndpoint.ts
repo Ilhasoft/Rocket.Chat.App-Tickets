@@ -4,7 +4,7 @@ import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IRespo
 
 import AppError from '../../domain/AppError';
 import AppPreferences from '../../local/app/AppPreferences';
-import HeaderValidator from '../../utils/HeaderValidator';
+import RequestHeadersValidator from '../../utils/RequestHeadersValidator';
 import validateRequest from './ValidateSettingsEndpoint';
 
 export class SettingsEndpoint extends ApiEndpoint {
@@ -21,8 +21,7 @@ export class SettingsEndpoint extends ApiEndpoint {
 
         try {
             // Headers validation
-            const headerValidator = new HeaderValidator(read);
-            await headerValidator.validate(request.headers);
+            await RequestHeadersValidator.validate(read, request.headers);
 
             // Query parameters verification
             validateRequest(request.content);

@@ -19,8 +19,7 @@ export class CheckSecretEndpoint extends ApiEndpoint {
 
         // Headers validation
         try {
-            const headerValidator = new RequestHeadersValidator(read);
-            await headerValidator.validate(request.headers);
+            await RequestHeadersValidator.validate(read, request.headers);
         } catch (e) {
             this.app.getLogger().error(e);
             if (e.constructor.name === AppError.name) {
