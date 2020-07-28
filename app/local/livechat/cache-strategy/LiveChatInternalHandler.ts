@@ -34,7 +34,7 @@ export default class LiveChatInternalHandler implements ILiveChatInternalDataSou
         return department as Department;
     }
 
-    public async sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<void> {
+    public async sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<string> {
         const livechatMessageBuilder = this.modify.getCreator().startLivechatMessage()
             .setRoom(room)
             .setVisitor(room.visitor);
@@ -42,7 +42,8 @@ export default class LiveChatInternalHandler implements ILiveChatInternalDataSou
             livechatMessageBuilder.setText(text);
         }
         // TODO: else to handle attachments
-        await this.modify.getCreator().finish(livechatMessageBuilder);
+        const messageId = await this.modify.getCreator().finish(livechatMessageBuilder);
+        return messageId;
     }
 
     public async getVisitorByToken(token: string): Promise<IVisitor | undefined> {

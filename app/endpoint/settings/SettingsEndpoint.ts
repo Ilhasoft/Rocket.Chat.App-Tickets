@@ -3,12 +3,14 @@ import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-en
 import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 
 import AppError from '../../domain/AppError';
+import AppPreferences from '../../local/app/AppPreferences';
 import RequestHeadersValidator from '../../utils/RequestHeadersValidator';
+import validateRequest from './ValidateSettingsEndpoint';
 
-export class CheckSecretEndpoint extends ApiEndpoint {
-    public path = 'secret.check';
+export class SettingsEndpoint extends ApiEndpoint {
+    public path = 'settings';
 
-    public async get(
+    public async put(
         request: IApiRequest,
         endpoint: IApiEndpointInfo,
         read: IRead,
@@ -17,9 +19,18 @@ export class CheckSecretEndpoint extends ApiEndpoint {
         persis: IPersistence,
     ): Promise<IApiResponseJSON> {
 
-        // Headers validation
         try {
+            // Headers validation
             await RequestHeadersValidator.validate(read, request.headers);
+
+            // Query parameters verification
+            validateRequest(request.content);
+
+            const appCache = new AppPreferences(read.getPersistenceReader(), persis);
+            const callbackUrl = request.content.webhook.url;
+            await appCache.setCallbackUrl(callbackUrl);
+
+            return this.json({status: HttpStatusCode.CREATED});
         } catch (e) {
             this.app.getLogger().error(e);
             if (e.constructor.name === AppError.name) {
@@ -28,7 +39,5 @@ export class CheckSecretEndpoint extends ApiEndpoint {
 
             return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
         }
-
-        return this.json({status: HttpStatusCode.NO_CONTENT});
     }
 }

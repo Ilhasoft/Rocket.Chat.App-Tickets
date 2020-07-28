@@ -3,8 +3,10 @@ import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-en
 import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 
 import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
+import AppError from '../../domain/AppError';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
+import RequestHeadersValidator from '../../utils/RequestHeadersValidator';
 import validateRequest from './ValidateVisitorMessageEndpoint';
 
 export class VisitorMesssageEndpoint extends ApiEndpoint {
@@ -20,32 +22,34 @@ export class VisitorMesssageEndpoint extends ApiEndpoint {
         persis: IPersistence,
     ): Promise<IApiResponseJSON> {
 
-        // Query parameters verification
-        const errors = validateRequest(request.content);
-        if (errors) {
-            const errorMessage = `Invalid content parameters...: ${JSON.stringify(errors)}`;
-            this.app.getLogger().error(errorMessage);
-            return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMessage}});
+        try {
+            // Headers validation
+            await RequestHeadersValidator.validate(read, request.headers);
+
+            // Query parameters verification
+            validateRequest(request.content);
+
+            // livechatRepo initialization
+            const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
+                new LiveChatCacheHandler(read.getPersistenceReader(), persis),
+                new LiveChatInternalHandler(modify, read.getLivechatReader()),
+            );
+
+            // get room from cache
+            const room = await livechatRepo.getRoomByVisitorToken(request.content.visitor.token);
+
+            // TODO: Validate attachments
+            // const attachments = JSON.parse(request.content.attachments);
+            const messageId = await livechatRepo.sendMessage(request.content.text, [], room.room);
+            return this.json({status: HttpStatusCode.CREATED, content: {id: messageId}});
+        } catch (e) {
+            this.app.getLogger().error(e);
+            if (e.constructor.name === AppError.name) {
+                return this.json({status: e.statusCode, content: {error: e.message}});
+            }
+
+            return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
         }
 
-        // livechatRepo initialization
-        const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
-            new LiveChatCacheHandler(read.getPersistenceReader(), persis),
-            new LiveChatInternalHandler(modify, read.getLivechatReader()),
-        );
-
-        // get room from cache
-        const room = await livechatRepo.getRoomByVisitorToken(request.content.visitor.token);
-        if (!room) {
-            const errorMessage = `Could not find room for visitor with token: ${request.content.visitor.token}`;
-            this.app.getLogger().error(errorMessage);
-            return this.json({status: HttpStatusCode.NOT_FOUND, content: {error: errorMessage}});
-        }
-
-        // TODO: Validate attachments
-        // const attachments = JSON.parse(request.content.attachments);
-        await livechatRepo.sendMessage(request.content.text, [], room.room);
-
-        return this.success();
     }
 }

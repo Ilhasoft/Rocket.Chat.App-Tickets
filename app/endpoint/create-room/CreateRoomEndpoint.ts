@@ -7,6 +7,7 @@ import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strat
 import AppError from '../../domain/AppError';
 import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
 import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
+import RequestHeadersValidator from '../../utils/RequestHeadersValidator';
 import validateRequest from './ValidateCreateRoomRequest';
 
 export class CreateRoomEndpoint extends ApiEndpoint {
@@ -21,22 +22,20 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         persis: IPersistence,
     ): Promise<IApiResponseJSON> {
 
-        // Query parameters verification
-        const errors = validateRequest(request.content);
-        if (errors) {
-            const errorMessage = `Invalid body parameters...: ${JSON.stringify(errors)}`;
-            this.app.getLogger().error(errorMessage);
-            return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMessage}});
-        }
-
-        // livechatRepo initialization
-        const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
-            new LiveChatCacheHandler(read.getPersistenceReader(), persis),
-            new LiveChatInternalHandler(modify, read.getLivechatReader()),
-        );
-
-        // Execute visitor and room creation
         try {
+            // Headers validation
+            await RequestHeadersValidator.validate(read, request.headers);
+
+            // Query parameters verification
+            validateRequest(request.content);
+
+            // livechatRepo initialization
+            const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
+                new LiveChatCacheHandler(read.getPersistenceReader(), persis),
+                new LiveChatInternalHandler(modify, read.getLivechatReader()),
+                );
+
+            // Execute visitor and room creation
             const visitor = request.content.visitor as IVisitor;
             const createdVisitor = await livechatRepo.createVisitor(visitor);
             const room = await livechatRepo.createRoom(
