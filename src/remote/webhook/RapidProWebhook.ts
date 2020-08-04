@@ -1,9 +1,9 @@
 import { IHttp, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 import { IMessageAttachment } from '@rocket.chat/apps-engine/definition/messages';
 
-import IWebhookRepository from '../../../data/hooks/rapidpro/IWebhookRepository';
-import Room from '../../../domain/Room';
-import { RC_SERVER_URL } from '../../../settings/Constants';
+import IWebhookRepository from '../../data/webhook/IWebhookRepository';
+import Room from '../../domain/Room';
+import { RC_SERVER_URL } from '../../settings/Constants';
 
 export default class RapidProWebhook implements IWebhookRepository {
 

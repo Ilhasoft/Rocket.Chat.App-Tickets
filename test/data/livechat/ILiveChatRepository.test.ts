@@ -4,13 +4,13 @@ import { IMessageAttachment } from '@rocket.chat/apps-engine/definition/messages
 import { assert } from 'chai';
 import { anything, capture, instance, mock, verify, when } from 'ts-mockito';
 
-import ILiveChatCacheDataSource from '../../../app/data/livechat/cache-strategy/ILiveChatCacheDataSource';
-import ILiveChatInternalDataSource from '../../../app/data/livechat/cache-strategy/ILiveChatInternalDataSource';
-import LiveChatCacheStrategyRepositoryImpl from '../../../app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
-import ILiveChatRepository from '../../../app/data/livechat/ILiveChatRepository';
-import AppError from '../../../app/domain/AppError';
-import Department from '../../../app/domain/Department';
-import Room from '../../../app/domain/Room';
+import ILiveChatCacheDataSource from '../../../src/data/livechat/ILiveChatCacheDataSource';
+import ILiveChatInternalDataSource from '../../../src/data/livechat/ILiveChatInternalDataSource';
+import LiveChatRepositoryImpl from '../../../src/data/livechat/LiveChatRepositoryImpl';
+import ILiveChatRepository from '../../../src/data/livechat/ILiveChatRepository';
+import AppError from '../../../src/domain/AppError';
+import Department from '../../../src/domain/Department';
+import Room from '../../../src/domain/Room';
 import departmentFactory from '../../factories/DepartmentFactory';
 import livechatRoomFactory from '../../factories/LivechatRoomFactory';
 import roomFactory from '../../factories/RoomFactory';
@@ -27,7 +27,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
         it('should call from internal data source', async () => {
@@ -46,7 +46,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
         it('should call from cache data source', async () => {
@@ -65,7 +65,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
         it('should call from internal data source', async () => {
@@ -86,7 +86,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
         it('should throw an AppError due to undefined visitor', async () => {
@@ -125,7 +125,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
         it('should throw an AppError due to undefined visitor', async () => {
@@ -187,7 +187,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
         it('should thrown an error beacuse the visitor room already exists', async () => {
@@ -276,7 +276,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
         it('should throw an error beacuse of an invalid department', async () => {

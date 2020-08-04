@@ -1,7 +1,7 @@
 import { ILivechatRoom } from '@rocket.chat/apps-engine/definition/livechat';
 
-import Department from '../../../domain/Department';
-import Room from '../../../domain/Room';
+import Department from '../../domain/Department';
+import Room from '../../domain/Room';
 
 export default interface ILiveChatCacheDataSource {
 

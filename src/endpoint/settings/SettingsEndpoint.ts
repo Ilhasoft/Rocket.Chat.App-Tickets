@@ -3,7 +3,7 @@ import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-en
 import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 
 import AppError from '../../domain/AppError';
-import AppPreferences from '../../local/app/AppPreferences';
+import AppPersistence from '../../local/app/AppPersistence';
 import RequestHeadersValidator from '../../utils/RequestHeadersValidator';
 import validateRequest from './ValidateSettingsEndpoint';
 
@@ -26,7 +26,7 @@ export class SettingsEndpoint extends ApiEndpoint {
             // Query parameters verification
             validateRequest(request.content);
 
-            const appCache = new AppPreferences(read.getPersistenceReader(), persis);
+            const appCache = new AppPersistence(read.getPersistenceReader(), persis);
             const callbackUrl = request.content.webhook.url;
             await appCache.setCallbackUrl(callbackUrl);
 
