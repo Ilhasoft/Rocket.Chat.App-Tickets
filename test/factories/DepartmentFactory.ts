@@ -5,7 +5,7 @@ import Department from '../../app/domain/Department';
 
 const departmentFactory = Factory.Sync.makeFactory<Department>({
     id: faker.random.alphaNumeric(16),
-    name: faker.name.jobTitle(),
+    name: faker.name.jobArea(),
 });
 
 export default departmentFactory;

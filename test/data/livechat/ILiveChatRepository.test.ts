@@ -1,3 +1,4 @@
+import { HttpStatusCode } from '@rocket.chat/apps-engine/definition/accessors';
 import { ILivechatRoom, IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 import { IMessageAttachment } from '@rocket.chat/apps-engine/definition/messages';
 import { assert } from 'chai';
@@ -7,6 +8,7 @@ import ILiveChatCacheDataSource from '../../../app/data/livechat/cache-strategy/
 import ILiveChatInternalDataSource from '../../../app/data/livechat/cache-strategy/ILiveChatInternalDataSource';
 import LiveChatCacheStrategyRepositoryImpl from '../../../app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
 import ILiveChatRepository from '../../../app/data/livechat/ILiveChatRepository';
+import AppError from '../../../app/domain/AppError';
 import Department from '../../../app/domain/Department';
 import Room from '../../../app/domain/Room';
 import departmentFactory from '../../factories/DepartmentFactory';
@@ -16,8 +18,8 @@ import visitorFactory from '../../factories/VisitorFactory';
 
 describe('ILiveChatRepository', () => {
 
-    let mockedCache: ILiveChatCacheDataSource = mock<ILiveChatCacheDataSource>();
-    let mockedInternal: ILiveChatInternalDataSource = mock<ILiveChatInternalDataSource>();
+    let mockedCache: ILiveChatCacheDataSource;
+    let mockedInternal: ILiveChatInternalDataSource;
     let livechatRepo: ILiveChatRepository;
 
     describe('#getDepartmentByName()', () => {
@@ -28,7 +30,7 @@ describe('ILiveChatRepository', () => {
             livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
-        it('should call from InternalDataSource', async () => {
+        it('should call from internal data source', async () => {
             const name = 'support';
 
             when(mockedInternal.getDepartmentByName(name)).thenResolve(departmentFactory.build());
@@ -47,7 +49,7 @@ describe('ILiveChatRepository', () => {
             livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
-        it('should call from CacheDataSource', async () => {
+        it('should call from cache data source', async () => {
             const livechat = livechatRoomFactory.build();
 
             when(mockedCache.deleteRoom(livechat)).thenResolve();
@@ -66,7 +68,7 @@ describe('ILiveChatRepository', () => {
             livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
-        it('should call from InternalDataSource', async () => {
+        it('should call from internal data source', async () => {
             const text = 'text from message';
             const attachments = mock<Array<IMessageAttachment>>();
             const livechat: ILivechatRoom = livechatRoomFactory.build();
@@ -87,18 +89,7 @@ describe('ILiveChatRepository', () => {
             livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
-        it('should call from CacheDataSource', async () => {
-            const token = 'jetaEBBr5jhxU3mS';
-            const livechat: Room = roomFactory.build();
-
-            when(mockedCache.getRoomByVisitorToken(token)).thenResolve(livechat);
-
-            await livechatRepo.getRoomByVisitorToken(token);
-
-            verify(mockedCache.getRoomByVisitorToken(token)).once();
-        });
-
-        it('should throw an Error', async () => {
+        it('should throw an AppError due to undefined visitor', async () => {
 
             const token = 'jetaEBBr5jhxU3mS';
 
@@ -108,9 +99,25 @@ describe('ILiveChatRepository', () => {
                 await livechatRepo.getRoomByVisitorToken(token);
                 assert.fail('should have thrown an error');
             } catch (error) {
+                assert.equal(error.constructor.name, AppError.name);
                 assert.equal(error.toString(), `Error: Could not find room for visitor with token: ${token}`);
+                assert.equal(error.statusCode, HttpStatusCode.NOT_FOUND);
             }
         });
+
+        it('should return a visitor when the given visitor token is valid', async () => {
+            const token = 'jetaEBBr5jhxU3mS';
+            const livechat: Room = roomFactory.build();
+
+            when(mockedCache.getRoomByVisitorToken(token)).thenResolve(livechat);
+
+            const room = await livechatRepo.getRoomByVisitorToken(token);
+
+            verify(mockedCache.getRoomByVisitorToken(token)).once();
+
+            assert.equal(room, livechat);
+        });
+
     });
 
     describe('#endpointCloseRoom()', () => {
@@ -121,7 +128,26 @@ describe('ILiveChatRepository', () => {
             livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
         });
 
-        it('should call from cache data source', async () => {
+        it('should throw an AppError due to undefined visitor', async () => {
+            const token = '3YffpUPb957Ca2Zx';
+            const comment = 'see you later';
+            const livechat: Room = roomFactory.build();
+
+            when(mockedCache.getRoomByVisitorToken(token)).thenResolve(undefined);
+            when(mockedInternal.closeRoom(livechat.room, comment)).thenResolve();
+
+            try {
+                await livechatRepo.endpointCloseRoom(token, comment);
+                assert.fail('should have thrown an error');
+            } catch (error) {
+                assert.equal(error.constructor.name, AppError.name);
+                assert.equal(error.toString(), `Error: Could not find a room for the visitor with token: ${token}`);
+                assert.equal(error.statusCode, HttpStatusCode.NOT_FOUND);
+            }
+
+        });
+
+        it('should call from cache data source to get the visitor room', async () => {
             const token = '3YffpUPb957Ca2Zx';
             const comment = 'see you later';
             const livechat: Room = roomFactory.build();
@@ -137,7 +163,7 @@ describe('ILiveChatRepository', () => {
 
         });
 
-        it('should call from internal data source', async () => {
+        it('should call from internal data source to close the visitor room', async () => {
             const token = '3YffpUPb957Ca2Zx';
             const comment = 'see you later';
             const livechat: Room = roomFactory.build();
@@ -154,23 +180,6 @@ describe('ILiveChatRepository', () => {
 
         });
 
-        it('should throw an error', async () => {
-            const token = '3YffpUPb957Ca2Zx';
-            const comment = 'see you later';
-            const livechat: Room = roomFactory.build();
-
-            when(mockedCache.getRoomByVisitorToken(token)).thenResolve(undefined);
-            when(mockedInternal.closeRoom(livechat.room, comment)).thenResolve();
-
-            try {
-                await livechatRepo.endpointCloseRoom(token, comment);
-                assert.fail('should have thrown an error');
-            } catch (error) {
-                assert.equal(error.toString(), `Error: Could not find a room for the visitor with token: ${token}`);
-            }
-
-        });
-
     });
 
     describe('#createRoom()', () => {
@@ -179,6 +188,26 @@ describe('ILiveChatRepository', () => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
             livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+        });
+
+        it('should thrown an error beacuse the visitor room already exists', async () => {
+            const ticketId = '3YffpUPb957Ca2Zx';
+            const contactUuid = 'see you later';
+            const livechatVisitor: IVisitor = visitorFactory.build();
+            const livechatRoom: ILivechatRoom = livechatRoomFactory.build();
+            const room: Room = roomFactory.build({ ticketId, contactUuid, room: livechatRoom });
+
+            when(mockedCache.getRoomByVisitorToken(livechatVisitor.token)).thenResolve(room);
+
+            try {
+                await livechatRepo.createRoom(ticketId, contactUuid, livechatVisitor);
+                assert.fail('should have thrown an error for existing visitor room');
+            } catch (error) {
+                assert.equal(error.constructor.name, AppError.name);
+                assert.equal(error.toString(), `Error: Visitor already exists`);
+                assert.equal(error.statusCode, HttpStatusCode.BAD_REQUEST);
+            }
+
         });
 
         it('should not return an existing livechat room for a new visitor', async () => {
@@ -240,24 +269,6 @@ describe('ILiveChatRepository', () => {
 
         });
 
-        it('should thrown an error beacuse the visitor room already exists', async () => {
-            const ticketId = '3YffpUPb957Ca2Zx';
-            const contactUuid = 'see you later';
-            const livechatVisitor: IVisitor = visitorFactory.build();
-            const livechatRoom: ILivechatRoom = livechatRoomFactory.build();
-            const room: Room = roomFactory.build({ ticketId, contactUuid, room: livechatRoom });
-
-            when(mockedCache.getRoomByVisitorToken(livechatVisitor.token)).thenResolve(room);
-
-            try {
-                await livechatRepo.createRoom(ticketId, contactUuid, livechatVisitor);
-                assert.fail('should have thrown an error for existing visitor room');
-            } catch (error) {
-                assert.equal(error.toString(), `Error: Visitor already exists`);
-            }
-
-        });
-
     });
 
     describe('#createVisitor()', () => {
@@ -266,6 +277,23 @@ describe('ILiveChatRepository', () => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
             livechatRepo = new LiveChatCacheStrategyRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+        });
+
+        it('should throw an error beacuse of an invalid department', async () => {
+            const livechatVisitor: IVisitor = visitorFactory.build();
+            const department: Department = departmentFactory.build({ name: livechatVisitor.department });
+
+            when(mockedInternal.getDepartmentByName(livechatVisitor.department!)).thenResolve(undefined);
+
+            try {
+                await livechatRepo.createVisitor(livechatVisitor);
+                assert.fail('should have thrown an error for invalid department');
+            } catch (error) {
+                assert.equal(error.constructor.name, AppError.name);
+                assert.equal(error.toString(), `Error: Could not find department with name: ${livechatVisitor.department}`);
+                assert.equal(error.statusCode, HttpStatusCode.NOT_FOUND);
+            }
+
         });
 
         it('should get a valid department if visitor department is specified', async () => {
@@ -294,21 +322,6 @@ describe('ILiveChatRepository', () => {
                 verify(mockedInternal.getDepartmentByName(department.name)).never();
             } catch (error) {
                 assert.fail(error);
-            }
-
-        });
-
-        it('should throw an error beacuse of an invalid department', async () => {
-            const livechatVisitor: IVisitor = visitorFactory.build();
-            const department: Department = departmentFactory.build({ name: livechatVisitor.department });
-
-            when(mockedInternal.getDepartmentByName(livechatVisitor.department!)).thenResolve(undefined);
-
-            try {
-                await livechatRepo.createVisitor(livechatVisitor);
-                assert.fail('should have thrown an error for invalid department');
-            } catch (error) {
-                assert.equal(error.toString(), `Error: Could not find department with name: ${livechatVisitor.department}`);
             }
 
         });
