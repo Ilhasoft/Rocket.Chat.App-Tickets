@@ -29,7 +29,7 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
         if (visitor.department) {
             department = await this.getDepartmentByName(visitor.department);
             if (!department) {
-                throw new AppError(`Could not find department with name: ${visitor.department}`, HttpStatusCode.BAD_REQUEST);
+                throw new AppError(`Could not find department with name: ${visitor.department}`, HttpStatusCode.NOT_FOUND);
             }
             visitor.department = department.id;
         }
@@ -68,7 +68,7 @@ export default class LiveChatCacheStrategyRepositoryImpl implements ILiveChatRep
     public async endpointCloseRoom(visitorToken: string, comment: string): Promise<void> {
         const cache = await this.cacheDataSource.getRoomByVisitorToken(visitorToken);
         if (!cache) {
-            throw new AppError(`Could not find a room for the visitor with token: ${visitorToken}`, HttpStatusCode.BAD_REQUEST);
+            throw new AppError(`Could not find a room for the visitor with token: ${visitorToken}`, HttpStatusCode.NOT_FOUND);
         }
         await this.internalDataSource.closeRoom(cache.room, comment);
     }

@@ -1,8 +1,27 @@
 {
     "devDependencies": {
         "@rocket.chat/apps-engine": "^1.12.0",
+        "@types/chai": "^4.2.12",
+        "@types/chai-spies": "^1.0.1",
+        "@types/faker": "^4.1.12",
+        "@types/mocha": "^8.0.0",
         "@types/node": "^10.17.27",
+        "@types/supertest": "^2.0.10",
+        "chai": "^4.2.0",
+        "chai-factories": "^0.1.0",
+        "chai-http": "^4.3.0",
+        "chai-spies": "^1.0.0",
+        "factory.ts": "^0.5.1",
+        "faker": "^4.1.0",
+        "mocha": "^8.0.1",
+        "nyc": "^15.1.0",
+        "ts-mockito": "^2.6.1",
+        "ts-node": "^8.10.2",
         "tslint": "^5.10.0",
-        "typescript": "^2.9.1"
+        "typescript": "^2.9.2"
+    },
+    "scripts": {
+        "test-dev": "mocha -r ts-node/register test/**/*.test.ts; exit 0",
+        "coverage": "nyc npm run test-dev"
     }
 }
