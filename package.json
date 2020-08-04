@@ -2,7 +2,13 @@
     "devDependencies": {
         "@rocket.chat/apps-engine": "^1.12.0",
         "@types/node": "^10.17.27",
+        "@types/uuid": "^8.0.0",
+        "fs": "0.0.1-security",
         "tslint": "^5.10.0",
-        "typescript": "^2.9.1"
+        "typescript": "^2.9.1",
+        "uuid": "^8.3.0"
+    },
+    "scripts": {
+        "publish": "node ./scripts/branding.js; rc-apps package; rc-apps submit"
     }
 }
