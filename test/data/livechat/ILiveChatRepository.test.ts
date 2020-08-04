@@ -6,8 +6,8 @@ import { anything, capture, instance, mock, verify, when } from 'ts-mockito';
 
 import ILiveChatCacheDataSource from '../../../src/data/livechat/ILiveChatCacheDataSource';
 import ILiveChatInternalDataSource from '../../../src/data/livechat/ILiveChatInternalDataSource';
-import LiveChatRepositoryImpl from '../../../src/data/livechat/LiveChatRepositoryImpl';
 import ILiveChatRepository from '../../../src/data/livechat/ILiveChatRepository';
+import LiveChatRepositoryImpl from '../../../src/data/livechat/LiveChatRepositoryImpl';
 import AppError from '../../../src/domain/AppError';
 import Department from '../../../src/domain/Department';
 import Room from '../../../src/domain/Room';
@@ -253,14 +253,14 @@ describe('ILiveChatRepository', () => {
 
             when(mockedCache.getRoomByVisitorToken(livechatVisitor.token)).thenResolve(undefined);
             when(mockedInternal.createRoom(livechatVisitor)).thenResolve(room);
-            when(mockedCache.saveRoom({ ticketId, contactUuid, room })).thenResolve();
+            when(mockedCache.saveRoom({ ticketID: ticketId, contactUUID: contactUuid, room })).thenResolve();
 
             try {
                 await livechatRepo.createRoom(ticketId, contactUuid, livechatVisitor);
                 verify(mockedCache.saveRoom(anything())).once();
                 const [saveRoomArg] = capture(mockedCache.saveRoom).last();
-                assert.equal(saveRoomArg.ticketId, ticketId);
-                assert.equal(saveRoomArg.contactUuid, contactUuid);
+                assert.equal(saveRoomArg.ticketID, ticketId);
+                assert.equal(saveRoomArg.contactUUID, contactUuid);
                 assert.equal(saveRoomArg.room, room);
 
             } catch (error) {

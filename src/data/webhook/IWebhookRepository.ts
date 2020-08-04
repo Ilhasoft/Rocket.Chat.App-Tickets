@@ -6,6 +6,6 @@ export default interface IWebhookRepository {
 
    onCloseRoom(room: Room): Promise<void>;
 
-   sendAgentMessage(room: Room, message?: string, attachments?: Array<IMessageAttachment>): Promise<void>;
+   onAgentMessage(room: Room, message?: string, attachments?: Array<IMessageAttachment>): Promise<void>;
 
 }
