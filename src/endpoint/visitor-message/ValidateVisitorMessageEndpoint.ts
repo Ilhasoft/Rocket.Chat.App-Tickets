@@ -34,7 +34,7 @@ export default function validateRequest(query: any): void {
     const errors = validate(query, constraints);
 
     if (errors) {
-        throw new AppError(`Invalid body parameters...:  ${errors}`, HttpStatusCode.BAD_REQUEST);
+        throw new AppError(JSON.stringify(errors), HttpStatusCode.BAD_REQUEST);
     }
 
 }
