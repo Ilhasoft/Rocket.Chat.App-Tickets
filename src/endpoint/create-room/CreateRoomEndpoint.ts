@@ -3,10 +3,10 @@ import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-en
 import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
 import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 
-import LiveChatCacheStrategyRepositoryImpl from '../../data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
+import LiveChatRepositoryImpl from '../../data/livechat/LiveChatRepositoryImpl';
 import AppError from '../../domain/AppError';
-import LiveChatCacheHandler from '../../local/livechat/cache-strategy/LiveChatCacheHandler';
-import LiveChatInternalHandler from '../../local/livechat/cache-strategy/LiveChatInternalHandler';
+import LiveChatPersistence from '../../local/livechat/LiveChatPersistence';
+import LiveChatAppsEngine from '../../local/livechat/LiveChatAppsEngine';
 import RequestHeadersValidator from '../../utils/RequestHeadersValidator';
 import validateRequest from './ValidateCreateRoomRequest';
 
@@ -30,9 +30,9 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             validateRequest(request.content);
 
             // livechatRepo initialization
-            const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
-                new LiveChatCacheHandler(read.getPersistenceReader(), persis),
-                new LiveChatInternalHandler(modify, read.getLivechatReader()),
+            const livechatRepo = new LiveChatRepositoryImpl(
+                new LiveChatPersistence(read.getPersistenceReader(), persis),
+                new LiveChatAppsEngine(modify, read.getLivechatReader()),
                 );
 
             // Execute visitor and room creation

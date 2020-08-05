@@ -15,18 +15,18 @@ import { IMessage, IPostMessageSent } from '@rocket.chat/apps-engine/definition/
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { RoomType } from '@rocket.chat/apps-engine/definition/rooms';
 
-import LiveChatCacheStrategyRepositoryImpl from './app/data/livechat/cache-strategy/LiveChatCacheStrategyRepositoryImpl';
-import { CheckSecretEndpoint } from './app/endpoint/check-secret/CheckSecretEndpoint';
-import { CloseRoomEndpoint } from './app/endpoint/close-room/CloseRoomEndpoint';
-import { CreateRoomEndpoint } from './app/endpoint/create-room/CreateRoomEndpoint';
-import { SettingsEndpoint } from './app/endpoint/settings/SettingsEndpoint';
-import { VisitorMesssageEndpoint } from './app/endpoint/visitor-message/VisitorMessageEndpoint';
-import AppPreferences from './app/local/app/AppPreferences';
-import LiveChatCacheHandler from './app/local/livechat/cache-strategy/LiveChatCacheHandler';
-import LiveChatInternalHandler from './app/local/livechat/cache-strategy/LiveChatInternalHandler';
-import RapidProWebhook from './app/remote/hooks/rapidpro/RapidProWebhook';
-import { AppSettings } from './app/settings/AppSettings';
-import { APP_SECRET } from './app/settings/Constants';
+import LiveChatRepositoryImpl from './src/data/livechat/LiveChatRepositoryImpl';
+import { CheckSecretEndpoint } from './src/endpoint/check-secret/CheckSecretEndpoint';
+import { CloseRoomEndpoint } from './src/endpoint/close-room/CloseRoomEndpoint';
+import { CreateRoomEndpoint } from './src/endpoint/create-room/CreateRoomEndpoint';
+import { SettingsEndpoint } from './src/endpoint/settings/SettingsEndpoint';
+import { VisitorMesssageEndpoint } from './src/endpoint/visitor-message/VisitorMessageEndpoint';
+import AppPersistence from './src/local/app/AppPersistence';
+import LiveChatPersistence from './src/local/livechat/LiveChatPersistence';
+import LiveChatAppsEngine from './src/local/livechat/LiveChatAppsEngine';
+import RapidProWebhook from './src/remote/webhook/RapidProWebhook';
+import { AppSettings } from './src/settings/AppSettings';
+import { APP_SECRET } from './src/settings/Constants';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPostMessageSent {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -57,9 +57,9 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
     public async executeLivechatRoomClosedHandler(data: ILivechatRoom, read: IRead, http: IHttp, persistence: IPersistence) {
         const visitor: IVisitor = (data.visitor as any) as IVisitor;
 
-        const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
-            new LiveChatCacheHandler(read.getPersistenceReader(), persistence),
-            new LiveChatInternalHandler({} as IModify, read.getLivechatReader()),
+        const livechatRepo = new LiveChatRepositoryImpl(
+            new LiveChatPersistence(read.getPersistenceReader(), persistence),
+            new LiveChatAppsEngine({} as IModify, read.getLivechatReader()),
         );
 
         const room = await livechatRepo.getRoomByVisitorToken(visitor.token);
@@ -71,7 +71,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
 
         await livechatRepo.eventCloseRoom(room.room);
 
-        const appCache = new AppPreferences(read.getPersistenceReader(), persistence);
+        const appCache = new AppPersistence(read.getPersistenceReader(), persistence);
         const callbackUrl = await appCache.getCallbackUrl();
         if (!callbackUrl) {
             const errorMessage = `Callback URL not defined`;
@@ -89,7 +89,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
     public async executePostMessageSent(message: IMessage, read: IRead, http: IHttp, persistence: IPersistence, modify: IModify): Promise<void> {
         if (message.room.type === RoomType.LIVE_CHAT) { // check if current room is a livechat one
             if (message.sender.roles.includes('livechat-agent')) { // check if sender is an agent
-                const appCache = new AppPreferences(read.getPersistenceReader(), persistence);
+                const appCache = new AppPersistence(read.getPersistenceReader(), persistence);
                 const callbackUrl = await appCache.getCallbackUrl();
                 if (!callbackUrl) {
                     const errorMessage = `Callback URL not defined`;
@@ -99,9 +99,9 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
                 const secret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
                 const rapidproWebhook = new RapidProWebhook(read, http, callbackUrl, secret);
 
-                const livechatRepo = new LiveChatCacheStrategyRepositoryImpl(
-                    new LiveChatCacheHandler(read.getPersistenceReader(), persistence),
-                    new LiveChatInternalHandler({} as IModify, read.getLivechatReader()),
+                const livechatRepo = new LiveChatRepositoryImpl(
+                    new LiveChatPersistence(read.getPersistenceReader(), persistence),
+                    new LiveChatAppsEngine({} as IModify, read.getLivechatReader()),
                 );
 
                 const room = await livechatRepo.getRoomByVisitorToken(message.room['visitor'].token);
