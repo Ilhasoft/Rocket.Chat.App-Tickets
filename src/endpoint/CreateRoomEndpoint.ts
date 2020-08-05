@@ -8,7 +8,7 @@ import LiveChatRepositoryImpl from '../data/livechat/LiveChatRepositoryImpl';
 import AppError from '../domain/AppError';
 import LiveChatAppsEngine from '../local/livechat/LiveChatAppsEngine';
 import LiveChatPersistence from '../local/livechat/LiveChatPersistence';
-import {UUID_FORMAT} from '../settings/Constants';
+import {PATTERN_DATE_ISO8601, PATTERN_UUID} from '../settings/Constants';
 import RequestBodyValidator from '../utils/RequestBodyValidator';
 import RequestHeadersValidator from '../utils/RequestHeadersValidator';
 
@@ -23,9 +23,21 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             },
             type: 'string',
             format: {
-                pattern: UUID_FORMAT,
+                pattern: PATTERN_UUID,
             },
         },
+        'priority': {
+            presence: false,
+            type: 'string',
+        },
+        // TODO
+        // 'sessionStart': {
+        //     presence: false,
+        //     type: 'string',
+        //     format: {
+        //         pattern: PATTERN_DATE_ISO8601,
+        //     },
+        // },
         'visitor': {
             presence: {
                 allowEmpty: false,
@@ -43,7 +55,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             },
             type: 'string',
             format: {
-                pattern: UUID_FORMAT,
+                pattern: PATTERN_UUID,
             },
         },
         'visitor.department': {
@@ -64,6 +76,10 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         'visitor.phone': {
             presence: false,
             type: 'string',
+        },
+        'visitor.customFields': {
+            presence: false,
+            type: 'array',
         },
     };
 
@@ -88,8 +104,8 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             const visitor = request.content.visitor as IVisitor;
             const createdVisitor = await livechatRepo.createVisitor(visitor);
             const room = await livechatRepo.createRoom(
-                request.content.ticketId,
-                request.content.visitor.contactUuid,
+                request.content.ticketID,
+                request.content.visitor.contactUUID,
                 createdVisitor.visitor,
             );
             return this.json({status: HttpStatusCode.CREATED, content: {id: room.id}});

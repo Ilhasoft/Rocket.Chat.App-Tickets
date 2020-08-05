@@ -26,12 +26,6 @@ export class CloseRoomEndpoint extends ApiEndpoint {
             },
             type: 'string',
         },
-        'comment': {
-            presence: {
-                allowEmpty: false,
-            },
-            type: 'string',
-        },
     };
 
     public async get(
@@ -50,8 +44,8 @@ export class CloseRoomEndpoint extends ApiEndpoint {
                 new LiveChatPersistence(read.getPersistenceReader(), persis),
                 new LiveChatAppsEngine(modify, read.getLivechatReader()),
             );
-            await livechatRepo.endpointCloseRoom(request.content.visitor.token, request.content.comment);
-            return this.success();
+            await livechatRepo.endpointCloseRoom(request.content.visitor.token);
+            return this.json({status: HttpStatusCode.NO_CONTENT});
         } catch (e) {
             this.app.getLogger().error(e);
 

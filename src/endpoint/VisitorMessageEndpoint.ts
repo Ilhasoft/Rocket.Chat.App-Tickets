@@ -28,15 +28,9 @@ export class VisitorMessageEndpoint extends ApiEndpoint {
         },
         'text': {
             presence: {
-                allowEmpty: true,
+                allowEmpty: false,
             },
             type: 'string',
-        },
-        'attachments': {
-            presence: {
-                allowEmpty: true,
-            },
-            type: 'array',
         },
     };
 
@@ -58,10 +52,8 @@ export class VisitorMessageEndpoint extends ApiEndpoint {
             );
             const room = await livechatRepo.getRoomByVisitorToken(request.content.visitor.token);
 
-            // TODO: validate attachments
-            // const attachments = JSON.parse(request.content.attachments);
-            const messageId = await livechatRepo.sendMessage(request.content.text, [], room.room);
-            return this.json({status: HttpStatusCode.CREATED, content: {id: messageId}});
+            const msgID = await livechatRepo.sendMessage(request.content.text, room.room);
+            return this.json({status: HttpStatusCode.CREATED, content: {id: msgID}});
         } catch (e) {
             this.app.getLogger().error(e);
 

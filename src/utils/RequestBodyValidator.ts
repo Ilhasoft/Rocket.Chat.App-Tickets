@@ -7,7 +7,7 @@ export default class RequestBodyValidator {
     public static async validate(constraints, body) {
         const errors = validate(body, constraints);
         if (errors) {
-            throw new AppError(errors, HttpStatusCode.BAD_REQUEST);
+            throw new AppError(JSON.stringify(errors), HttpStatusCode.BAD_REQUEST);
         }
     }
 

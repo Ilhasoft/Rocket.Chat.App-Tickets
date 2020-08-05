@@ -50,7 +50,6 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
                 new VisitorMessageEndpoint(this),
             ],
         } as IApi);
-        this.getLogger().log('App initialized');
     }
 
     public async extendConfiguration(configuration: IConfigurationExtend): Promise<void> {

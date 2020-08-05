@@ -1,6 +1,5 @@
 import {HttpStatusCode} from '@rocket.chat/apps-engine/definition/accessors';
 import {ILivechatRoom, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
-import {IMessageAttachment} from '@rocket.chat/apps-engine/definition/messages';
 
 import AppError from '../../domain/AppError';
 import Department from '../../domain/Department';
@@ -57,30 +56,31 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
         return room;
     }
 
-    public async createRoom(ticketId: string, contactUuid: string, visitor: IVisitor): Promise<ILivechatRoom> {
+    public async createRoom(ticketID: string, contactUUID: string, visitor: IVisitor): Promise<ILivechatRoom> {
         const cache = await this.cacheDataSource.getRoomByVisitorToken(visitor.token);
         if (cache) {
-            throw new AppError(`Visitor is already in a room`, HttpStatusCode.BAD_REQUEST);
+            throw new AppError(`Visitor already has an open room`, HttpStatusCode.BAD_REQUEST);
         }
         const room = await this.internalDataSource.createRoom(visitor);
-        await this.cacheDataSource.saveRoom({ticketID: ticketId, contactUUID: contactUuid, room} as Room);
+        await this.cacheDataSource.saveRoom({ticketID, contactUUID, room} as Room);
         return room;
-    }
-
-    public async endpointCloseRoom(visitorToken: string, comment: string): Promise<void> {
-        const cache = await this.cacheDataSource.getRoomByVisitorToken(visitorToken);
-        if (!cache) {
-            throw new AppError(`Could not find a room for visitor token: ${visitorToken}`, HttpStatusCode.NOT_FOUND);
-        }
-        await this.internalDataSource.closeRoom(cache.room, comment);
     }
 
     public async eventCloseRoom(room: ILivechatRoom): Promise<void> {
         await this.cacheDataSource.deleteRoom(room);
     }
 
-    public async sendMessage(text: string, attachments: Array<IMessageAttachment>, room: ILivechatRoom): Promise<string> {
-        return await this.internalDataSource.sendMessage(text, attachments, room);
+    public async endpointCloseRoom(visitorToken: string): Promise<void> {
+        const cache = await this.cacheDataSource.getRoomByVisitorToken(visitorToken);
+        if (!cache) {
+            throw new AppError(`Could not find a room for visitor token: ${visitorToken}`, HttpStatusCode.NOT_FOUND);
+        }
+        await this.internalDataSource.closeRoom(cache.room);
+        await this.cacheDataSource.deleteRoom(cache.room);
+    }
+
+    public async sendMessage(text: string, room: ILivechatRoom): Promise<string> {
+        return await this.internalDataSource.sendMessage(text, room);
     }
 
 }

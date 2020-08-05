@@ -43,7 +43,7 @@ export class SettingsEndpoint extends ApiEndpoint {
             const appDataSource: IAppDataSource = new AppPersistence(read.getPersistenceReader(), persis);
 
             await appDataSource.setCallbackUrl(callbackUrl);
-            return this.json({status: HttpStatusCode.CREATED});
+            return this.json({status: HttpStatusCode.NO_CONTENT});
         } catch (e) {
             this.app.getLogger().error(e);
 

@@ -10,13 +10,15 @@ export default class RequestHeadersValidator {
             throw new AppError('Invalid Content-Type header', HttpStatusCode.BAD_REQUEST);
         }
 
-        let appSecret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
-        if (!appSecret) {
+        let secret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
+        secret = secret.trim();
+
+        if (!secret) {
             throw new AppError('Secret not set', HttpStatusCode.FORBIDDEN);
         }
 
-        appSecret = `Token ${appSecret}`;
-        if (headers.authorization !== appSecret) {
+        secret = `Token ${secret}`;
+        if (headers.authorization !== secret) {
             throw new AppError('Invalid Authorization header', HttpStatusCode.FORBIDDEN);
         }
     }

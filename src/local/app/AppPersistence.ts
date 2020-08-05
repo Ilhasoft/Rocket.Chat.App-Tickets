@@ -17,16 +17,17 @@ export default class AppPersistence implements IAppDataSource {
     ) {
     }
 
-    public async setCallbackUrl(url: string): Promise<void> {
-        await this.writer.removeByAssociation(AppPersistence.ASSOC_CALLBACK_URL);
-        await this.writer.createWithAssociation({url}, AppPersistence.ASSOC_CALLBACK_URL);
-    }
     public async getCallbackUrl(): Promise<string | undefined> {
         const callbackUrl = await this.reader.readByAssociation(AppPersistence.ASSOC_CALLBACK_URL);
         if (!callbackUrl[0]) {
             return undefined;
         }
         return (callbackUrl[0] as any).url;
+    }
+
+    public async setCallbackUrl(url: string): Promise<void> {
+        await this.writer.removeByAssociation(AppPersistence.ASSOC_CALLBACK_URL);
+        await this.writer.createWithAssociation({url}, AppPersistence.ASSOC_CALLBACK_URL);
     }
 
 }
