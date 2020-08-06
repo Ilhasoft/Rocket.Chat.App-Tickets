@@ -1,7 +1,8 @@
-import { IHttp } from '@rocket.chat/apps-engine/definition/accessors';
-import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
+import {HttpStatusCode, IHttp} from '@rocket.chat/apps-engine/definition/accessors';
+import {IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 
 import IRapidProRemoteDataSource from '../../data/rapidpro/IRapidProRemoteDataSource';
+import RPMessage from '../../domain/RPMessage';
 
 export default class RapidProRestApi implements IRapidProRemoteDataSource {
 
@@ -12,6 +13,23 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
         private readonly timeout: number,
     ) {
         this.timeout = this.timeout < 5 ? 5 : this.timeout;
+    }
+
+    public async getMessages(contactUUID: string, after: string): Promise<Array<RPMessage>> {
+        const params = {
+            contact: contactUUID,
+            after,
+        };
+        const reqOptions = this.requestOptions();
+        reqOptions['params'] = params;
+
+        const response = await this.http.get(this.baseUrl + '/api/v2/messages.json', reqOptions);
+        if (!response || response.statusCode !== HttpStatusCode.OK) {
+            return [];
+        }
+        return response.data.results.map((message) => {
+            return {direction: message.direction, sentOn: message.sent_on, text: message.text} as RPMessage;
+        });
     }
 
     public async startFlow(uuid: string, visitor: IVisitor, extra: any): Promise<void> {

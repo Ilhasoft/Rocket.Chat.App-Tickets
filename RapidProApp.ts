@@ -28,8 +28,7 @@ import AppPersistence from './src/local/app/AppPersistence';
 import LiveChatAppsEngine from './src/local/livechat/LiveChatAppsEngine';
 import LiveChatPersistence from './src/local/livechat/LiveChatPersistence';
 import RapidProWebhook from './src/remote/webhook/RapidProWebhook';
-import {AppSettings} from './src/settings/AppSettings';
-import {APP_SECRET} from './src/settings/Constants';
+import {APP_SETTINGS, CONFIG_APP_SECRET} from './src/settings/Constants';
 
 export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPostMessageSent {
 
@@ -53,7 +52,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
     }
 
     public async extendConfiguration(configuration: IConfigurationExtend): Promise<void> {
-        AppSettings.forEach((setting) => configuration.settings.provideSetting(setting));
+        APP_SETTINGS.forEach((setting) => configuration.settings.provideSetting(setting));
     }
 
     // TODO: executePostLivechatRoomClosed is being executed twice due to a bug on Apps-engine 1.15.0, check when it's merged into 1.16.0 and use it
@@ -81,7 +80,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
             this.getLogger().error(`Callback URL not set`);
             return;
         }
-        const secret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
+        const secret = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_APP_SECRET);
         const webhook: IWebhookRepository = new RapidProWebhook(read, http, callbackUrl, secret);
 
         // call webhook
@@ -105,7 +104,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
             this.getLogger().error(`Callback URL not defined`);
             return;
         }
-        const secret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
+        const secret = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_APP_SECRET);
         const webhook = new RapidProWebhook(read, http, callbackUrl, secret);
 
         const livechatRepo: ILiveChatRepository = new LiveChatRepositoryImpl(

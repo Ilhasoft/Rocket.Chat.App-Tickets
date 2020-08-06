@@ -1,7 +1,7 @@
 import { HttpStatusCode, IRead } from '@rocket.chat/apps-engine/definition/accessors';
 
 import AppError from '../domain/AppError';
-import { APP_SECRET } from '../settings/Constants';
+import { CONFIG_APP_SECRET } from '../settings/Constants';
 
 export default class RequestHeadersValidator {
 
@@ -10,7 +10,7 @@ export default class RequestHeadersValidator {
             throw new AppError('Invalid Content-Type header', HttpStatusCode.BAD_REQUEST);
         }
 
-        let secret = await read.getEnvironmentReader().getSettings().getValueById(APP_SECRET);
+        let secret = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_APP_SECRET);
         secret = secret.trim();
 
         if (!secret) {

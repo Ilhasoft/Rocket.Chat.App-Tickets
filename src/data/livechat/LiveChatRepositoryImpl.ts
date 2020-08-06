@@ -4,6 +4,7 @@ import {ILivechatRoom, IVisitor} from '@rocket.chat/apps-engine/definition/livec
 import AppError from '../../domain/AppError';
 import Department from '../../domain/Department';
 import Room from '../../domain/Room';
+import RPMessage, {Direction} from '../../domain/RPMessage';
 import Visitor from '../../domain/Visitor';
 import ILiveChatCacheDataSource from './ILiveChatCacheDataSource';
 import ILiveChatInternalDataSource from './ILiveChatInternalDataSource';
@@ -81,6 +82,22 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
 
     public async sendMessage(text: string, room: ILivechatRoom): Promise<string> {
         return await this.internalDataSource.sendMessage(text, room);
+    }
+
+    public async sendChatbotHistory(messages: Array<RPMessage>, room: ILivechatRoom): Promise<string> {
+        return await this.internalDataSource.sendMessage(this.buildChatbotMessage(messages), room);
+    }
+
+    private buildChatbotMessage(messages: Array<RPMessage>): string {
+        let messageText = '**LOG**';
+
+        for (let i = messages.length - 1; i >= 0; i--) {
+            const sentOn = messages[i].sentOn;
+            messageText += messages[i].direction === Direction.IN
+                ? `\n> :bust_in_silhouette: [${sentOn}]: \`${messages[i].text}\``
+                : `\n> :robot: [${sentOn}]: ${messages[i].text}`;
+        }
+        return messageText;
     }
 
 }
