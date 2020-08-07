@@ -17,7 +17,7 @@ export default class RapidProWebhook implements IWebhookRepository {
     public async onCloseRoom(room: Room): Promise<void> {
         const payload = {
             type: 'close-room',
-            ticketId: room.ticketId,
+            ticketId: room.ticketID,
             visitor: {
                 token: room.room.visitor.token,
             },
@@ -33,10 +33,10 @@ export default class RapidProWebhook implements IWebhookRepository {
         await this.http.post(this.baseCallbackUrl, reqOptions);
     }
 
-    public async sendAgentMessage(room: Room, text?: string, attachments?: Array<IMessageAttachment>): Promise<void> {
+    public async onAgentMessage(room: Room, text?: string, attachments?: Array<IMessageAttachment>): Promise<void> {
         const payload = {
             type: 'agent-message',
-            ticketId: room.ticketId,
+            ticketId: room.ticketID,
             visitor: {
                 token: room.room.visitor.token,
             },

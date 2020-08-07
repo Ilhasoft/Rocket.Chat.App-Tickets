@@ -3,15 +3,9 @@ import { ILivechatRoom } from '@rocket.chat/apps-engine/definition/livechat';
 import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
 
 import ILiveChatCacheDataSource from '../../data/livechat/ILiveChatCacheDataSource';
-import Department from '../../domain/Department';
 import Room from '../../domain/Room';
 
 export default class LiveChatPersistence implements ILiveChatCacheDataSource {
-
-    private static readonly ASSOC_DEPARTMENTS = new RocketChatAssociationRecord(
-        RocketChatAssociationModel.MISC,
-        'livechat_departments',
-    );
 
     private static readonly ASSOC_VISITOR_COUNT = new RocketChatAssociationRecord(
         RocketChatAssociationModel.MISC,
@@ -29,20 +23,6 @@ export default class LiveChatPersistence implements ILiveChatCacheDataSource {
         private readonly reader: IPersistenceRead,
         private readonly writer: IPersistence,
     ) {
-    }
-
-    // TODO: invalidate cache
-    public async getDepartments(): Promise<Array<Department>> {
-        const objects = await this.reader.readByAssociation(LiveChatPersistence.ASSOC_DEPARTMENTS);
-        return objects.map((o) => o as Department);
-    }
-
-    public async saveDepartments(departments: Array<Department>): Promise<number> {
-        await this.writer.removeByAssociation(LiveChatPersistence.ASSOC_DEPARTMENTS);
-        departments.map(async (d) => {
-            await this.writer.createWithAssociation(d, LiveChatPersistence.ASSOC_DEPARTMENTS);
-        });
-        return departments.length;
     }
 
     public async getRoomByVisitorToken(token: string): Promise<Room | undefined> {
@@ -64,11 +44,11 @@ export default class LiveChatPersistence implements ILiveChatCacheDataSource {
     }
 
     public async getNewVisitorUsername(): Promise<string> {
-        const assoc = await this.reader.readByAssociation(LiveChatPersistence.ASSOC_VISITOR_COUNT);
         let count;
+        const assoc = await this.reader.readByAssociation(LiveChatPersistence.ASSOC_VISITOR_COUNT);
         if (!assoc[0]) {
             count = 0;
-            this.writer.createWithAssociation({count}, LiveChatPersistence.ASSOC_VISITOR_COUNT);
+            await this.writer.createWithAssociation({count}, LiveChatPersistence.ASSOC_VISITOR_COUNT);
         } else {
             count = assoc[0]['count'];
         }

@@ -5,8 +5,8 @@ import Room from '../../src/domain/Room';
 import livechatRoomFactory from './LivechatRoomFactory';
 
 const roomFactory = Factory.Sync.makeFactory<Room>({
-    ticketId: faker.random.uuid(),
-    contactUuid: faker.random.uuid(),
+    ticketID: faker.random.uuid(),
+    contactUUID: faker.random.uuid(),
     room: livechatRoomFactory.build(),
 });
 
