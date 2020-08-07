@@ -5,8 +5,8 @@ import { CONFIG_APP_SECRET } from '../settings/Constants';
 
 export default class RequestHeadersValidator {
 
-    public static async validate(read: IRead, headers: {[key: string]: string}) {
-        if (headers['content-type'] !== 'application/json') {
+    public static async validate(read: IRead, headers: {[key: string]: string}, checkContentType: boolean = true) {
+        if (checkContentType && headers['content-type'] !== 'application/json') {
             throw new AppError('Invalid Content-Type header', HttpStatusCode.BAD_REQUEST);
         }
 

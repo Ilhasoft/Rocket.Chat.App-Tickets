@@ -16,17 +16,14 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
     }
 
     public async getMessages(contactUUID: string, after: string): Promise<Array<RPMessage>> {
-        const params = {
-            contact: contactUUID,
-            after,
-        };
         const reqOptions = this.requestOptions();
-        reqOptions['params'] = params;
+        reqOptions['params'] = {contact: contactUUID, after};
 
         const response = await this.http.get(this.baseUrl + '/api/v2/messages.json', reqOptions);
         if (!response || response.statusCode !== HttpStatusCode.OK) {
             return [];
         }
+
         return response.data.results.map((message) => {
             return {direction: message.direction, sentOn: message.sent_on, text: message.text} as RPMessage;
         });

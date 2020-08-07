@@ -89,7 +89,7 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
     }
 
     private buildChatbotMessage(messages: Array<RPMessage>): string {
-        let messageText = '**LOG**';
+        let messageText = '**Log**';
 
         for (let i = messages.length - 1; i >= 0; i--) {
             const sentOn = messages[i].sentOn;
