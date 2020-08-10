@@ -3,6 +3,7 @@ import {IMessageAttachment} from '@rocket.chat/apps-engine/definition/messages';
 
 import IWebhookRepository from '../../data/webhook/IWebhookRepository';
 import Room from '../../domain/Room';
+import { joypixels } from '../../lib/joypixels/6_0_0/joypixels';
 import {RC_SERVER_URL} from '../../settings/Constants';
 import AttachmentUtils from '../../utils/AttachmentUtils';
 
@@ -17,6 +18,9 @@ export default class RapidProWebhook implements IWebhookRepository {
     }
 
     public async onAgentMessage(room: Room, text?: string, attachments?: Array<IMessageAttachment>): Promise<void> {
+
+        text = joypixels.shortnameToUnicode(text);
+
         const payload = {
             type: 'agent-message',
             ticketID: room.ticketID,
