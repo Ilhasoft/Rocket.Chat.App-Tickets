@@ -93,6 +93,10 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
         if (message.room.type !== RoomType.LIVE_CHAT) {
             return;
         }
+
+        if (!message.sender.roles) {
+            return;
+        }
         // check if sender is an agent
         if (!message.sender.roles.includes('livechat-agent')) {
             return;

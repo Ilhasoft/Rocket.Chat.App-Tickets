@@ -2,7 +2,7 @@ import {HttpStatusCode, IHttp} from '@rocket.chat/apps-engine/definition/accesso
 import {IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 
 import IRapidProRemoteDataSource from '../../data/rapidpro/IRapidProRemoteDataSource';
-import RPMessage from '../../domain/RPMessage';
+import RPMessage, { Direction } from '../../domain/RPMessage';
 
 export default class RapidProRestApi implements IRapidProRemoteDataSource {
 
@@ -24,9 +24,18 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
             return [];
         }
 
-        return response.data.results.map((message) => {
-            return {direction: message.direction, sentOn: message.sent_on, text: message.text} as RPMessage;
+        let hasStartedConversation: boolean = false;
+        const result: Array<RPMessage> = [];
+        response.data.results.forEach((message) => {
+            if (message.direction === Direction.IN) {
+                hasStartedConversation = true;
+            }
+            if (hasStartedConversation) {
+                result.push({direction: message.direction, sentOn: message.sent_on, text: message.text} as RPMessage);
+            }
         });
+
+        return result;
     }
 
     public async startFlow(uuid: string, visitor: IVisitor, extra: any): Promise<void> {
