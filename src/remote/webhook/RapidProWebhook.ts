@@ -1,4 +1,4 @@
-import {IHttp, IRead} from '@rocket.chat/apps-engine/definition/accessors';
+import {HttpStatusCode, IHttp, IRead} from '@rocket.chat/apps-engine/definition/accessors';
 import {IMessageAttachment} from '@rocket.chat/apps-engine/definition/messages';
 
 import IWebhookRepository from '../../data/webhook/IWebhookRepository';
@@ -64,7 +64,7 @@ export default class RapidProWebhook implements IWebhookRepository {
         await this.http.post(this.callbackUrl, reqOptions);
     }
 
-    public async onCloseRoom(room: Room): Promise<void> {
+    public async onCloseRoom(room: Room): Promise<boolean> {
         const payload = {
             type: 'close-room',
             ticketID: room.ticketID,
@@ -80,7 +80,8 @@ export default class RapidProWebhook implements IWebhookRepository {
         const reqOptions = this.requestOptions();
         reqOptions['data'] = payload;
 
-        await this.http.post(this.callbackUrl, reqOptions);
+        const response = await this.http.post(this.callbackUrl, reqOptions);
+        return response && response.statusCode === HttpStatusCode.OK;
     }
 
     private requestOptions(): object {

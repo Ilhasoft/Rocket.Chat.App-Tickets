@@ -71,9 +71,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
             return;
         }
 
-        // close room through event
-        await livechatRepo.eventCloseRoom(room.room);
-
+        // initialize webhook
         const appDataSource: IAppDataSource = new AppPersistence(read.getPersistenceReader(), persistence);
         const callbackUrl = await appDataSource.getCallbackUrl();
         if (!callbackUrl) {
@@ -83,8 +81,10 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
         const secret = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_APP_SECRET);
         const webhook: IWebhookRepository = new RapidProWebhook(read, http, callbackUrl, secret);
 
-        // call webhook
-        await webhook.onCloseRoom(room);
+        // if webhook was called successfully, close room on app
+        if (await webhook.onCloseRoom(room)) {
+            await livechatRepo.eventCloseRoom(room.room);
+        }
     }
 
     // TODO: change to an event that is only for livechat agents messages when it's available
