@@ -20,9 +20,9 @@ export default interface ILiveChatRepository {
 
     endpointCloseRoom(visitorToken: string): Promise<void>;
 
-    eventAgentMessage(room: Room, message?: string, attachments?: Array<IMessageAttachment>): Promise<void>;
+    sendAgentMessage(room: Room, message?: string, attachments?: Array<IMessageAttachment>): Promise<void>;
 
-    sendMessage(text: string, room: ILivechatRoom): Promise<string>;
+    sendVisitorMessage(text: string, room: Room): Promise<string>;
 
     sendChatbotHistory(messages: Array<RPMessage>, room: ILivechatRoom): Promise<string>;
 

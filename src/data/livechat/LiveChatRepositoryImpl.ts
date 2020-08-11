@@ -63,7 +63,11 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
     public async createRoom(ticketID: string, contactUUID: string, visitor: IVisitor): Promise<ILivechatRoom> {
         const cache = await this.cacheDataSource.getRoomByVisitorToken(visitor.token);
         if (cache) {
-            throw new AppError(`Visitor already has an open room`, HttpStatusCode.BAD_REQUEST);
+            if (cache.closed) {
+                await this.eventCloseRoom(cache);
+            } else {
+                throw new AppError(`Visitor already has an open room`, HttpStatusCode.BAD_REQUEST);
+            }
         }
         const room = await this.internalDataSource.createRoom(visitor);
         await this.cacheDataSource.saveRoom({ticketID, contactUUID, room} as Room);
@@ -87,12 +91,17 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
         await this.cacheDataSource.deleteRoom(cache);
     }
 
-    public async eventAgentMessage(room: Room, message?: string, attachments?: Array<IMessageAttachment>): Promise<void> {
+    public async sendAgentMessage(room: Room, message?: string, attachments?: Array<IMessageAttachment>): Promise<void> {
         return await this.webhook.onAgentMessage(room, message, attachments);
     }
 
-    public async sendMessage(text: string, room: ILivechatRoom): Promise<string> {
-        return await this.internalDataSource.sendMessage(text, room);
+    public async sendVisitorMessage(text: string, room: Room): Promise<string> {
+        if (room.closed) {
+            await this.eventCloseRoom(room);
+            return '';
+        } else {
+            return await this.internalDataSource.sendMessage(text, room.room);
+        }
     }
 
     public async sendChatbotHistory(messages: Array<RPMessage>, room: ILivechatRoom): Promise<string> {

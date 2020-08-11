@@ -53,7 +53,7 @@ export class VisitorMessageEndpoint extends ApiEndpoint {
                 await InstanceHelper.newDefaultLivechatWebhook(http, read, persis),
             );
             const room = await livechatRepo.getRoomByVisitorToken(request.content.visitor.token);
-            const msgID = await livechatRepo.sendMessage(request.content.text, room.room);
+            const msgID = await livechatRepo.sendVisitorMessage(request.content.text, room);
 
             return this.json({status: HttpStatusCode.CREATED, content: {id: msgID}});
         } catch (e) {

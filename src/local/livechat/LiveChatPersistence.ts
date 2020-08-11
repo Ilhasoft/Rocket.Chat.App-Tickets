@@ -46,6 +46,7 @@ export default class LiveChatPersistence implements ILiveChatCacheDataSource {
     }
 
     public async saveRoom(room: Room): Promise<void> {
+        room.closed = false;
         await this.writer.createWithAssociation(room, LiveChatPersistence.ASSOC_ROOM(room.room.visitor.token));
     }
 

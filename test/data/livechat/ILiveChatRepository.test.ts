@@ -300,7 +300,7 @@ describe('ILiveChatRepository', () => {
 
             when(mockedInternal.sendMessage(text, room)).thenResolve('2hSb3rKy8fn5uwWd');
 
-            await livechatRepo.sendMessage(text, room);
+            await livechatRepo.sendVisitorMessage(text, room);
             verify(mockedInternal.sendMessage(text, room)).once();
         });
     });

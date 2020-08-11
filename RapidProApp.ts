@@ -83,7 +83,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
             }
 
             // call agent message event
-            await livechatRepo.eventAgentMessage(room, message.text, message.attachments);
+            await livechatRepo.sendAgentMessage(room, message.text, message.attachments);
         } catch (e) {
             this.getLogger().error(e.message);
         }
