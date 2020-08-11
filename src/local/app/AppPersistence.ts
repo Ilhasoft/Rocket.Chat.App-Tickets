@@ -14,7 +14,7 @@ export default class AppPersistence implements IAppDataSource {
         RocketChatAssociationModel.MISC,
         'AppPersistence_rp_host_url',
     );
-    private static readonly PATTERN_HOST = /^https?:\/\/[-.\w]+(\/|$)/;
+    private static readonly REGEX_HOST = /^https?:\/\/[-.\w]+(\/|$)/;
 
     private persisUtils: PersistenceUtils;
 
@@ -29,7 +29,7 @@ export default class AppPersistence implements IAppDataSource {
     public async setCallbackUrl(url: string): Promise<void> {
         await this.persisUtils.writeValue(url, AppPersistence.ASSOC_CALLBACK_URL);
 
-        const matching = AppPersistence.PATTERN_HOST.exec(url);
+        const matching = AppPersistence.REGEX_HOST.exec(url);
         if (matching) {
             await this.setRPHostUrl(matching[0]);
         }

@@ -3,6 +3,7 @@ import {IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 
 import IRapidProRemoteDataSource from '../../data/rapidpro/IRapidProRemoteDataSource';
 import RPMessage, { Direction } from '../../domain/RPMessage';
+import DateStringUtils from '../../utils/DateStringUtils';
 
 export default class RapidProRestApi implements IRapidProRemoteDataSource {
 
@@ -23,15 +24,19 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
         if (!response || response.statusCode !== HttpStatusCode.OK) {
             return [];
         }
+        const tzOffset = DateStringUtils.getTimezoneOffsetInMinutes(after);
 
         let hasStartedConversation: boolean = false;
         const result: Array<RPMessage> = [];
+
         response.data.results.forEach((message) => {
+            const sentOn = DateStringUtils.addMinutes(message.sent_on, tzOffset);
+
             if (message.direction === Direction.IN) {
                 hasStartedConversation = true;
             }
             if (hasStartedConversation) {
-                result.push({direction: message.direction, sentOn: message.sent_on, text: message.text} as RPMessage);
+                result.push({direction: message.direction, sentOn, text: message.text} as RPMessage);
             }
         });
 

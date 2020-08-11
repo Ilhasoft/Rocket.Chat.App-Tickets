@@ -85,17 +85,19 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
     }
 
     public async sendChatbotHistory(messages: Array<RPMessage>, room: ILivechatRoom): Promise<string> {
-        return await this.internalDataSource.sendMessage(this.buildChatbotMessage(messages), room);
+        if (messages.length === 0) {
+            return '';
+        }
+        return await this.internalDataSource.sendMessage(this.buildChatbotHistoryMessage(messages), room);
     }
 
-    private buildChatbotMessage(messages: Array<RPMessage>): string {
-        let messageText = '**Log**';
+    private buildChatbotHistoryMessage(messages: Array<RPMessage>): string {
+        let messageText = '**Chatbot History**';
 
         for (let i = messages.length - 1; i >= 0; i--) {
-            const sentOn = messages[i].sentOn;
             messageText += messages[i].direction === Direction.IN
-                ? `\n> :bust_in_silhouette: [${sentOn}]: \`${messages[i].text}\``
-                : `\n> :robot: [${sentOn}]: ${messages[i].text}`;
+                ? `\n> :bust_in_silhouette: [${messages[i].sentOn}]: \`${messages[i].text}\``
+                : `\n> :robot: [${messages[i].sentOn}]: ${messages[i].text}`;
         }
         return messageText;
     }
