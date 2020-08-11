@@ -18,6 +18,7 @@ import {
 import {PATTERN_UUID} from '../utils/Constants';
 import RequestBodyValidator from '../utils/RequestBodyValidator';
 import RequestHeadersValidator from '../utils/RequestHeadersValidator';
+import InstanceHelper from "../utils/InstanceHelper";
 
 export class CreateRoomEndpoint extends ApiEndpoint {
 
@@ -104,11 +105,14 @@ export class CreateRoomEndpoint extends ApiEndpoint {
                 await RequestBodyValidator.validateDateString(sessionStart);
             }
 
-            // save the visitor and create a room to it
+            // initialize livechat repository
             const livechatRepo: ILiveChatRepository = new LiveChatRepositoryImpl(
-                new LiveChatPersistence(read.getPersistenceReader(), persis),
-                new LiveChatAppsEngine(modify, read.getLivechatReader()),
+                await InstanceHelper.newDefaultLivechatCacheDataSource(read.getPersistenceReader(), persis),
+                await InstanceHelper.newDefaultLivechatInternalDataSource(modify, read.getLivechatReader()),
+                await InstanceHelper.newDefaultLivechatWebhook(http, read, persis),
             );
+
+            // save the visitor and create a room to it
             const visitor = request.content.visitor as IVisitor;
             const createdVisitor = await livechatRepo.createVisitor(visitor);
             const room = await livechatRepo.createRoom(

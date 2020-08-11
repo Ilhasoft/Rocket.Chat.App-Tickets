@@ -1,6 +1,7 @@
 import {HttpStatusCode} from '@rocket.chat/apps-engine/definition/accessors';
 import {ILivechatRoom, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 
+import {IMessageAttachment} from '@rocket.chat/apps-engine/definition/messages';
 import AppError from '../../domain/AppError';
 import Department from '../../domain/Department';
 import Room from '../../domain/Room';
@@ -9,12 +10,14 @@ import Visitor from '../../domain/Visitor';
 import ILiveChatCacheDataSource from './ILiveChatCacheDataSource';
 import ILiveChatInternalDataSource from './ILiveChatInternalDataSource';
 import ILiveChatRepository from './ILiveChatRepository';
+import ILiveChatWebhook from './ILiveChatWebhook';
 
 export default class LiveChatRepositoryImpl implements ILiveChatRepository {
 
     constructor(
         private readonly cacheDataSource: ILiveChatCacheDataSource,
         private readonly internalDataSource: ILiveChatInternalDataSource,
+        private readonly webhook: ILiveChatWebhook,
     ) {
     }
 
@@ -67,8 +70,12 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
         return room;
     }
 
-    public async eventCloseRoom(room: ILivechatRoom): Promise<void> {
-        await this.cacheDataSource.deleteRoom(room);
+    public async eventCloseRoom(room: Room): Promise<void> {
+        if (await this.webhook.onCloseRoom(room)) {
+            await this.cacheDataSource.deleteRoom(room);
+        } else {
+            await this.cacheDataSource.markRoomAsClosed(room);
+        }
     }
 
     public async endpointCloseRoom(visitorToken: string): Promise<void> {
@@ -77,7 +84,11 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
             throw new AppError(`Could not find a room for visitor token: ${visitorToken}`, HttpStatusCode.NOT_FOUND);
         }
         await this.internalDataSource.closeRoom(cache.room);
-        await this.cacheDataSource.deleteRoom(cache.room);
+        await this.cacheDataSource.deleteRoom(cache);
+    }
+
+    public async eventAgentMessage(room: Room, message?: string, attachments?: Array<IMessageAttachment>): Promise<void> {
+        return await this.webhook.onAgentMessage(room, message, attachments);
     }
 
     public async sendMessage(text: string, room: ILivechatRoom): Promise<string> {

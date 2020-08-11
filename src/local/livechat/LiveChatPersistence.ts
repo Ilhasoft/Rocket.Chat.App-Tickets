@@ -1,9 +1,9 @@
-import { IPersistence, IPersistenceRead } from '@rocket.chat/apps-engine/definition/accessors';
-import { ILivechatRoom } from '@rocket.chat/apps-engine/definition/livechat';
-import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
+import {IPersistence, IPersistenceRead} from '@rocket.chat/apps-engine/definition/accessors';
+import {RocketChatAssociationModel, RocketChatAssociationRecord} from '@rocket.chat/apps-engine/definition/metadata';
 
 import ILiveChatCacheDataSource from '../../data/livechat/ILiveChatCacheDataSource';
 import Room from '../../domain/Room';
+import PersistenceUtils from '../../utils/PersistenceUtils';
 
 export default class LiveChatPersistence implements ILiveChatCacheDataSource {
 
@@ -19,10 +19,13 @@ export default class LiveChatPersistence implements ILiveChatCacheDataSource {
         );
     }
 
+    private persisUtils: PersistenceUtils;
+
     constructor(
         private readonly reader: IPersistenceRead,
         private readonly writer: IPersistence,
     ) {
+        this.persisUtils = new PersistenceUtils(reader, writer);
     }
 
     public async getRoomByVisitorToken(token: string): Promise<Room | undefined> {
@@ -32,29 +35,30 @@ export default class LiveChatPersistence implements ILiveChatCacheDataSource {
         return found as Room;
     }
 
+    public async getNewVisitorUsername(): Promise<string> {
+        let count = await this.persisUtils.readValue(LiveChatPersistence.ASSOC_VISITOR_COUNT);
+        if (!count) {
+            count = 0;
+        }
+        count += 1;
+        await this.persisUtils.writeValue(count, LiveChatPersistence.ASSOC_VISITOR_COUNT);
+        return `guest-${count}`;
+    }
+
     public async saveRoom(room: Room): Promise<void> {
         await this.writer.createWithAssociation(room, LiveChatPersistence.ASSOC_ROOM(room.room.visitor.token));
     }
 
-    public async deleteRoom(room: ILivechatRoom): Promise<void> {
-        const r = await this.getRoomByVisitorToken(room.visitor.token);
-        if (r) {
-            await this.writer.removeByAssociation(LiveChatPersistence.ASSOC_ROOM(room.visitor.token));
-        }
+    public async markRoomAsClosed(room: Room): Promise<void> {
+        room.closed = true;
+        await this.writer.updateByAssociation(LiveChatPersistence.ASSOC_ROOM(room.room.visitor.token), room);
     }
 
-    public async getNewVisitorUsername(): Promise<string> {
-        let count;
-        const assoc = await this.reader.readByAssociation(LiveChatPersistence.ASSOC_VISITOR_COUNT);
-        if (!assoc[0]) {
-            count = 0;
-            await this.writer.createWithAssociation({count}, LiveChatPersistence.ASSOC_VISITOR_COUNT);
-        } else {
-            count = assoc[0]['count'];
+    public async deleteRoom(room: Room): Promise<void> {
+        const r = await this.getRoomByVisitorToken(room.room.visitor.token);
+        if (r) {
+            await this.writer.removeByAssociation(LiveChatPersistence.ASSOC_ROOM(room.room.visitor.token));
         }
-        count += 1;
-        await this.writer.updateByAssociation(LiveChatPersistence.ASSOC_VISITOR_COUNT, {count});
-        return `guest-${count}`;
     }
 
 }
