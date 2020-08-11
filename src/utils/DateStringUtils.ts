@@ -52,7 +52,7 @@ export default class DateStringUtils {
         const minutes = parseInt(splitting[1], 10);
         const totalMinutes = hours * 60 + minutes;
 
-        return totalMinutes * (splitting[0] === '-' ? -1 : 1);
+        return totalMinutes * (splitting[0][0] === '-' ? -1 : 1);
     }
 
     public static addMinutes(date: string, minutes: number): string {

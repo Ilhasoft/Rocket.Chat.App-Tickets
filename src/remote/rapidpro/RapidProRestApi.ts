@@ -30,7 +30,7 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
         const result: Array<RPMessage> = [];
 
         response.data.results.forEach((message) => {
-            const sentOn = DateStringUtils.addMinutes(message.sent_on, tzOffset);
+            const sentOn = DateStringUtils.format(DateStringUtils.addMinutes(message.sent_on, tzOffset), 'yyyy/MM/dd, hh:mm:ss');
 
             if (message.direction === Direction.IN) {
                 hasStartedConversation = true;
@@ -63,7 +63,7 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
                 'Authorization': `Token ${this.authToken}`,
             },
             // TODO: check timeout parameter
-            // timeout: this.timeout,
+            timeout: this.timeout * 1000,
         };
     }
 
