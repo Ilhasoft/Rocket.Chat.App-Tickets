@@ -63,7 +63,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
         }
 
         // check if sender is an agent
-        if (message.sender.roles && !message.sender.roles.includes('livechat-agent')) {
+        if (!message.sender.roles || !message.sender.roles.includes('livechat-agent')) {
             return;
         }
 

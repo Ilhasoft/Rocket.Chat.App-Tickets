@@ -16,7 +16,7 @@ export default interface ILiveChatRepository {
 
     createRoom(ticketID: string, contactUUID: string, visitor: IVisitor): Promise<ILivechatRoom>;
 
-    eventCloseRoom(room: Room): Promise<void>;
+    eventCloseRoom(room: Room): Promise<boolean>;
 
     endpointCloseRoom(visitorToken: string): Promise<void>;
 

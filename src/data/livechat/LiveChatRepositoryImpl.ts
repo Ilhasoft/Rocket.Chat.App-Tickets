@@ -64,7 +64,9 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
         const cache = await this.cacheDataSource.getRoomByVisitorToken(visitor.token);
         if (cache) {
             if (cache.closed) {
-                await this.eventCloseRoom(cache);
+                if (!(await this.eventCloseRoom(cache))) {
+                    throw new AppError(`Visitor already has an open room`, HttpStatusCode.BAD_REQUEST);
+                }
             } else {
                 throw new AppError(`Visitor already has an open room`, HttpStatusCode.BAD_REQUEST);
             }
@@ -74,11 +76,13 @@ export default class LiveChatRepositoryImpl implements ILiveChatRepository {
         return room;
     }
 
-    public async eventCloseRoom(room: Room): Promise<void> {
+    public async eventCloseRoom(room: Room): Promise<boolean> {
         if (await this.webhook.onCloseRoom(room)) {
             await this.cacheDataSource.deleteRoom(room);
+            return true;
         } else {
             await this.cacheDataSource.markRoomAsClosed(room);
+            return false;
         }
     }
 
