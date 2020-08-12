@@ -16,9 +16,9 @@ import {
     CONFIG_REQUEST_TIMEOUT,
 } from '../settings/Constants';
 import {PATTERN_UUID} from '../utils/Constants';
+import InstanceHelper from '../utils/InstanceHelper';
 import RequestBodyValidator from '../utils/RequestBodyValidator';
 import RequestHeadersValidator from '../utils/RequestHeadersValidator';
-import InstanceHelper from "../utils/InstanceHelper";
 
 export class CreateRoomEndpoint extends ApiEndpoint {
 

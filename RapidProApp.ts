@@ -10,7 +10,7 @@ import {
 } from '@rocket.chat/apps-engine/definition/accessors';
 import {ApiSecurity, ApiVisibility, IApi} from '@rocket.chat/apps-engine/definition/api';
 import {App} from '@rocket.chat/apps-engine/definition/App';
-import {ILivechatRoom, ILivechatRoomClosedHandler, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
+import {ILivechatRoom, IPostLivechatRoomClosed, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 import {IMessage, IPostMessageSent} from '@rocket.chat/apps-engine/definition/messages';
 import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
 import {RoomType} from '@rocket.chat/apps-engine/definition/rooms';
@@ -24,7 +24,7 @@ import {VisitorMessageEndpoint} from './src/endpoint/VisitorMessageEndpoint';
 import {APP_SETTINGS} from './src/settings/Constants';
 import InstanceHelper from './src/utils/InstanceHelper';
 
-export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPostMessageSent {
+export class RapidProApp extends App implements IPostLivechatRoomClosed, IPostMessageSent {
 
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
@@ -89,7 +89,7 @@ export class RapidProApp extends App implements ILivechatRoomClosedHandler, IPos
         }
     }
 
-    public async executeLivechatRoomClosedHandler(
+    public async executePostLivechatRoomClosed(
         data: ILivechatRoom,
         read: IRead,
         http: IHttp,
