@@ -28,9 +28,6 @@ export default class RapidProWebhook implements ILiveChatWebhook {
                 token: room.room.visitor.token,
             },
             data: {
-                agent: {
-                    id: room.room.servedBy!.id,
-                },
                 text,
             },
         };
@@ -70,11 +67,6 @@ export default class RapidProWebhook implements ILiveChatWebhook {
             ticketID: room.ticketID,
             visitor: {
                 token: room.room.visitor.token,
-            },
-            data: {
-                agent: {
-                    id: room.room.servedBy!.id,
-                },
             },
         };
         const reqOptions = this.requestOptions();

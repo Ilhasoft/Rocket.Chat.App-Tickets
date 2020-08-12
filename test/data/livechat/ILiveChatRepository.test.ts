@@ -5,6 +5,7 @@ import {anyString, instance, mock, verify, when} from 'ts-mockito';
 import ILiveChatCacheDataSource from '../../../src/data/livechat/ILiveChatCacheDataSource';
 import ILiveChatInternalDataSource from '../../../src/data/livechat/ILiveChatInternalDataSource';
 import ILiveChatRepository from '../../../src/data/livechat/ILiveChatRepository';
+import ILiveChatWebhook from '../../../src/data/livechat/ILiveChatWebhook';
 import LiveChatRepositoryImpl from '../../../src/data/livechat/LiveChatRepositoryImpl';
 import AppError from '../../../src/domain/AppError';
 import departmentFactory from '../../factories/DepartmentFactory';
@@ -16,6 +17,7 @@ describe('ILiveChatRepository', () => {
 
     let mockedCache: ILiveChatCacheDataSource;
     let mockedInternal: ILiveChatInternalDataSource;
+    let mockedWebhook: ILiveChatWebhook;
     let livechatRepo: ILiveChatRepository;
 
     describe('#getDepartmentByName()', () => {
@@ -23,7 +25,8 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            mockedWebhook = mock<ILiveChatWebhook>();
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
         it(`should call from internal data source`, async () => {
@@ -41,7 +44,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
         it('should try to get the department when its name is specified', async () => {
@@ -154,7 +157,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
         it(`should throw an error when the visitor doesn't have an open room`, async () => {
@@ -188,7 +191,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
         it(`should throw an error when the visitor already have an open room`, async () => {
@@ -234,11 +237,11 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
         it(`should call from cache data source`, async () => {
-            const room = livechatRoomFactory.build();
+            const room = roomFactory.build();
 
             when(mockedCache.deleteRoom(room)).thenResolve();
 
@@ -252,7 +255,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
         it(`should throw an error when the given visitor doesn't have an open room`, async () => {
@@ -279,29 +282,29 @@ describe('ILiveChatRepository', () => {
             try {
                 await livechatRepo.endpointCloseRoom(token);
                 verify(mockedInternal.closeRoom(room.room)).once();
-                verify(mockedCache.deleteRoom(room.room)).once();
+                verify(mockedCache.deleteRoom(room)).once();
             } catch (e) {
                 assert.fail(e);
             }
         });
     });
 
-    describe('#sendMessage()', () => {
+    describe('#sendVisitorMessage()', () => {
 
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
-            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal));
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
         it(`should call from internal data source`, async () => {
             const text = 'Can you help me?';
-            const room = livechatRoomFactory.build();
+            const room = roomFactory.build();
 
-            when(mockedInternal.sendMessage(text, room)).thenResolve('2hSb3rKy8fn5uwWd');
+            when(mockedInternal.sendMessage(text, room.room)).thenResolve('2hSb3rKy8fn5uwWd');
 
             await livechatRepo.sendVisitorMessage(text, room);
-            verify(mockedInternal.sendMessage(text, room)).once();
+            verify(mockedInternal.sendMessage(text, room.room)).once();
         });
     });
 

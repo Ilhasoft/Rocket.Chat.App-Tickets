@@ -8,17 +8,12 @@ import LiveChatRepositoryImpl from '../data/livechat/LiveChatRepositoryImpl';
 import IRapidProRemoteDataSource from '../data/rapidpro/IRapidProRemoteDataSource';
 import AppError from '../domain/AppError';
 import AppPersistence from '../local/app/AppPersistence';
-import LiveChatAppsEngine from '../local/livechat/LiveChatAppsEngine';
-import LiveChatPersistence from '../local/livechat/LiveChatPersistence';
 import RapidProRestApi from '../remote/rapidpro/RapidProRestApi';
-import {
-    CONFIG_RAPIDPRO_AUTH_TOKEN,
-    CONFIG_REQUEST_TIMEOUT,
-} from '../settings/Constants';
+import {CONFIG_RAPIDPRO_AUTH_TOKEN, CONFIG_REQUEST_TIMEOUT} from '../settings/Constants';
 import {PATTERN_UUID} from '../utils/Constants';
-import InstanceHelper from '../utils/InstanceHelper';
 import RequestBodyValidator from '../utils/RequestBodyValidator';
 import RequestHeadersValidator from '../utils/RequestHeadersValidator';
+import InstanceHelper from './helpers/InstanceHelper';
 
 export class CreateRoomEndpoint extends ApiEndpoint {
 
@@ -83,7 +78,6 @@ export class CreateRoomEndpoint extends ApiEndpoint {
         },
         'visitor.customFields': {
             presence: false,
-            type: 'array',
         },
     };
 

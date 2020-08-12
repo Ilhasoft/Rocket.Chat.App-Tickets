@@ -6,15 +6,15 @@ import {
     IPersistenceRead,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import IAppDataSource from '../data/app/IAppDataSource';
-import ILiveChatCacheDataSource from '../data/livechat/ILiveChatCacheDataSource';
-import ILiveChatInternalDataSource from '../data/livechat/ILiveChatInternalDataSource';
-import ILiveChatWebhook from '../data/livechat/ILiveChatWebhook';
-import AppPersistence from '../local/app/AppPersistence';
-import LiveChatAppsEngine from '../local/livechat/LiveChatAppsEngine';
-import LiveChatPersistence from '../local/livechat/LiveChatPersistence';
-import RapidProWebhook from '../remote/livechat/RapidProWebhook';
-import {CONFIG_APP_SECRET} from '../settings/Constants';
+import IAppDataSource from '../../data/app/IAppDataSource';
+import ILiveChatCacheDataSource from '../../data/livechat/ILiveChatCacheDataSource';
+import ILiveChatInternalDataSource from '../../data/livechat/ILiveChatInternalDataSource';
+import ILiveChatWebhook from '../../data/livechat/ILiveChatWebhook';
+import AppPersistence from '../../local/app/AppPersistence';
+import LiveChatAppsEngine from '../../local/livechat/LiveChatAppsEngine';
+import LiveChatPersistence from '../../local/livechat/LiveChatPersistence';
+import RapidProWebhook from '../../remote/livechat/RapidProWebhook';
+import {CONFIG_APP_SECRET} from '../../settings/Constants';
 
 export default class InstanceHelper {
 

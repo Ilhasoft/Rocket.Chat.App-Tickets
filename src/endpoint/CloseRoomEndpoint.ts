@@ -5,9 +5,9 @@ import {IApiResponseJSON} from '@rocket.chat/apps-engine/definition/api/IRespons
 import ILiveChatRepository from '../data/livechat/ILiveChatRepository';
 import LiveChatRepositoryImpl from '../data/livechat/LiveChatRepositoryImpl';
 import AppError from '../domain/AppError';
-import InstanceHelper from '../utils/InstanceHelper';
 import RequestBodyValidator from '../utils/RequestBodyValidator';
 import RequestHeadersValidator from '../utils/RequestHeadersValidator';
+import InstanceHelper from './helpers/InstanceHelper';
 
 export class CloseRoomEndpoint extends ApiEndpoint {
 

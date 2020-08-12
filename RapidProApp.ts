@@ -19,10 +19,10 @@ import LiveChatRepositoryImpl from './src/data/livechat/LiveChatRepositoryImpl';
 import {CheckSecretEndpoint} from './src/endpoint/CheckSecretEndpoint';
 import {CloseRoomEndpoint} from './src/endpoint/CloseRoomEndpoint';
 import {CreateRoomEndpoint} from './src/endpoint/CreateRoomEndpoint';
+import InstanceHelper from './src/endpoint/helpers/InstanceHelper';
 import {SettingsEndpoint} from './src/endpoint/SettingsEndpoint';
 import {VisitorMessageEndpoint} from './src/endpoint/VisitorMessageEndpoint';
 import {APP_SETTINGS} from './src/settings/Constants';
-import InstanceHelper from './src/utils/InstanceHelper';
 
 export class RapidProApp extends App implements IPostLivechatRoomClosed, IPostMessageSent {
 
