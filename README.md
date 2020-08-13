@@ -1,8 +1,7 @@
-# [APP_NAME]
+# Tickets
 
 ## About
-
-[APP_NAME] is a [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) app to enable the integration between [rapidpro](https://github.com/rapidpro/rapidpro) ticketing service and the Rocket.Chat Omnichannel(Livechat) feature.
+Tickets is a [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) app to enable the integration between [<ins>**rapidpro**</ins>](https://github.com/rapidpro/rapidpro) ticketing service and the Rocket.Chat Omnichannel(Livechat) feature.
 
 ## Installation
 
@@ -30,7 +29,7 @@ Refer to this [guide](https://docs.rocket.chat/apps-development/getting-started)
 
 ## App Setup
 
-1. With the App installed, and with the `app_secret` provided on the Rocket.Chat ticket service integration setup on rapidpro, go to `Administration > Apps > [APP_NAME]`, and paste the `app_secret` on the `App Secret` field, then click `Save Changes`.
+1. With the App installed, and with the `app_secret` provided on the Rocket.Chat ticket service integration setup on rapidpro, go to `Administration > Apps > Tickets`, and paste the `app_secret` on the `App Secret` field, then click `Save Changes`.
 
 3. Return to rapidpro, and proceed with the integration setup after setting the `App Secret` field. This will automaticaly validate the integration between the App and rapidpro.
 
