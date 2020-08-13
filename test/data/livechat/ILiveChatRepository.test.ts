@@ -8,6 +8,7 @@ import ILiveChatRepository from '../../../src/data/livechat/ILiveChatRepository'
 import ILiveChatWebhook from '../../../src/data/livechat/ILiveChatWebhook';
 import LiveChatRepositoryImpl from '../../../src/data/livechat/LiveChatRepositoryImpl';
 import AppError from '../../../src/domain/AppError';
+import RPMessage, { Direction } from '../../../src/domain/RPMessage';
 import departmentFactory from '../../factories/DepartmentFactory';
 import livechatRoomFactory from '../../factories/LivechatRoomFactory';
 import roomFactory from '../../factories/RoomFactory';
@@ -44,6 +45,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
+            mockedWebhook = mock<ILiveChatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -157,6 +159,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
+            mockedWebhook = mock<ILiveChatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -191,10 +194,11 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
+            mockedWebhook = mock<ILiveChatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
-        it(`should throw an error when the visitor already have an open room`, async () => {
+        it(`should throw an error when the visitor already has an open room`, async () => {
             const ticketID = '3YffpUPb957Ca2Zx';
             const contactUUID = '1fe2e469-cfe4-4365-bc35-b4519d24d90d';
             const visitor = visitorFactory.build();
@@ -210,6 +214,47 @@ describe('ILiveChatRepository', () => {
                 assert.equal(e.constructor.name, AppError.name);
                 assert.equal(e.message, 'Visitor already has an open room');
                 assert.equal(e.statusCode, HttpStatusCode.BAD_REQUEST);
+            }
+        });
+
+        it(`should throw an error when the visitor already has an open room and the webhook call fails`, async () => {
+            const ticketID = '3YffpUPb957Ca2Zx';
+            const contactUUID = '1fe2e469-cfe4-4365-bc35-b4519d24d90d';
+            const visitor = visitorFactory.build();
+
+            const room = roomFactory.build({ticketID, contactUUID, closed: true});
+
+            when(mockedCache.getRoomByVisitorToken(visitor.token)).thenResolve(room);
+            when(mockedWebhook.onCloseRoom(room)).thenResolve(false);
+            when(mockedCache.markRoomAsClosed(room)).thenResolve();
+            try {
+                await livechatRepo.createRoom(ticketID, contactUUID, visitor);
+                assert.fail('should have thrown an error');
+            } catch (e) {
+                assert.equal(e.constructor.name, AppError.name);
+                assert.equal(e.message, 'Visitor already has an open room');
+                assert.equal(e.statusCode, HttpStatusCode.BAD_REQUEST);
+            }
+        });
+
+        it(`should create room after webhook call succeed`, async () => {
+            const ticketID = '3YffpUPb957Ca2Zx';
+            const contactUUID = '1fe2e469-cfe4-4365-bc35-b4519d24d90d';
+            const visitor = visitorFactory.build();
+
+            const room = roomFactory.build({ticketID, contactUUID, closed: true});
+
+            when(mockedCache.getRoomByVisitorToken(visitor.token)).thenResolve(room);
+            when(mockedWebhook.onCloseRoom(room)).thenResolve(true);
+            when(mockedCache.deleteRoom(room)).thenResolve();
+            when(mockedInternal.createRoom(visitor)).thenResolve(room.room);
+            when(mockedCache.saveRoom(room)).thenResolve();
+
+            try {
+                const created = await livechatRepo.createRoom(ticketID, contactUUID, visitor);
+                assert.equal(created, room.room);
+            } catch (e) {
+                assert.fail(e);
             }
         });
 
@@ -237,16 +282,30 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
+            mockedWebhook = mock<ILiveChatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
-        it(`should call from cache data source`, async () => {
+        it(`should delete room if webhook call was succeed`, async () => {
             const room = roomFactory.build();
 
+            when(mockedWebhook.onCloseRoom(room)).thenResolve(true);
             when(mockedCache.deleteRoom(room)).thenResolve();
 
-            await livechatRepo.eventCloseRoom(room);
+            const closed = await livechatRepo.eventCloseRoom(room);
             verify(mockedCache.deleteRoom(room)).once();
+            assert.equal(closed, true);
+        });
+
+        it(`should mark room as closed if webhook call was not succeed`, async () => {
+            const room = roomFactory.build();
+
+            when(mockedWebhook.onCloseRoom(room)).thenResolve(false);
+            when(mockedCache.markRoomAsClosed(room)).thenResolve();
+
+            const closed = await livechatRepo.eventCloseRoom(room);
+            verify(mockedCache.markRoomAsClosed(room)).once();
+            assert.equal(closed, false);
         });
     });
 
@@ -255,6 +314,7 @@ describe('ILiveChatRepository', () => {
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
+            mockedWebhook = mock<ILiveChatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -289,23 +349,106 @@ describe('ILiveChatRepository', () => {
         });
     });
 
+    describe('#sendAgentMessage()', () => {
+        beforeEach(() => {
+            mockedCache = mock<ILiveChatCacheDataSource>();
+            mockedInternal = mock<ILiveChatInternalDataSource>();
+            mockedWebhook = mock<ILiveChatWebhook>();
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
+        });
+
+        it(`should call from webhook`, async () => {
+            const text = 'What do you need?';
+            const room = roomFactory.build();
+            const attachments = [];
+
+            when(mockedWebhook.onAgentMessage(room, text, attachments)).thenResolve();
+
+            await livechatRepo.sendAgentMessage(room, text, attachments);
+            verify(mockedWebhook.onAgentMessage(room, text, attachments)).once();
+        });
+    });
+
     describe('#sendVisitorMessage()', () => {
 
         beforeEach(() => {
             mockedCache = mock<ILiveChatCacheDataSource>();
             mockedInternal = mock<ILiveChatInternalDataSource>();
+            mockedWebhook = mock<ILiveChatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
-        it(`should call from internal data source`, async () => {
+        it(`should close the visitor room and do not send the visitor message`, async () => {
+            const text = 'Can you help me?';
+            const room = roomFactory.build({closed: true});
+
+            when(mockedWebhook.onCloseRoom(room)).thenResolve(false);
+            when(mockedCache.markRoomAsClosed(room)).thenResolve();
+
+            const messageId = await livechatRepo.sendVisitorMessage(text, room);
+            verify(mockedWebhook.onCloseRoom(room)).once();
+            assert.equal(messageId, '');
+        });
+
+        it(`should send the visitor message`, async () => {
             const text = 'Can you help me?';
             const room = roomFactory.build();
 
             when(mockedInternal.sendMessage(text, room.room)).thenResolve('2hSb3rKy8fn5uwWd');
 
-            await livechatRepo.sendVisitorMessage(text, room);
+            const messageId = await livechatRepo.sendVisitorMessage(text, room);
             verify(mockedInternal.sendMessage(text, room.room)).once();
+            assert.equal(messageId, '2hSb3rKy8fn5uwWd');
         });
+    });
+
+    describe('#sendChatbotHistory()', () => {
+
+        beforeEach(() => {
+            mockedCache = mock<ILiveChatCacheDataSource>();
+            mockedInternal = mock<ILiveChatInternalDataSource>();
+            mockedWebhook = mock<ILiveChatWebhook>();
+            livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
+        });
+
+        it(`should not send the chatbot history for empty messages`, async () => {
+            const messages = [];
+            const room = roomFactory.build();
+
+            const messageId = await livechatRepo.sendChatbotHistory(messages, room.room);
+            assert.equal(messageId, '');
+        });
+
+        it(`should send chatbot history message`, async () => {
+            const room = livechatRoomFactory.build();
+            const messages = [
+                {
+                    direction: Direction.IN,
+                    sentOn: '2020/08/13, 11:25:43',
+                    text: 'Can you help me?',
+                } as RPMessage,
+                {
+                    direction: Direction.OUT,
+                    sentOn: '2020/08/13, 11:25:41',
+                    text: 'Hi',
+                } as RPMessage,
+                {
+                    direction: Direction.IN,
+                    sentOn: '2020/08/13, 11:25:37',
+                    text: 'Hello',
+                } as RPMessage,
+            ] as Array<RPMessage>;
+            const history = `**Chatbot History**` +
+            `\n> :bust_in_silhouette: [${messages[2].sentOn}]: \`${messages[2].text}\`` +
+            `\n> :robot: [${messages[1].sentOn}]: ${messages[1].text}` +
+            `\n> :bust_in_silhouette: [${messages[0].sentOn}]: \`${messages[0].text}\``;
+
+            when(mockedInternal.sendMessage(history, room)).thenResolve('2hSb3rKy8fn5uwWd');
+
+            const messageId = await livechatRepo.sendChatbotHistory(messages, room);
+            verify(mockedInternal.sendMessage(history, room)).once();
+        });
+
     });
 
 });
