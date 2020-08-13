@@ -1,9 +1,17 @@
 # Tickets
 
 ## About
-Tickets is a [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) app to enable the integration between [<ins>**rapidpro**</ins>](https://github.com/rapidpro/rapidpro) ticketing service and the Rocket.Chat Omnichannel(Livechat) feature.
+Tickets is a [Rocket.Chat](https://github.com/RocketChat/Rocket.Chat) app to enable the integration between [<ins>**rapidpro**</ins>](https://github.com/rapidpro/rapidpro) ticketing service and the Rocket.Chat Omnichannel (Livechat) feature.
 
 ## Installation
+
+### Prerequisites
+
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Node](https://nodejs.org/en/download/)
+- [RC-Apps](https://docs.rocket.chat/apps-development/getting-started#rocket-chat-app-engine-cli)
+
+To install manually on your Rocket.Chat instance you first need to enable the installation of apps in development mode at: `Administration > General > Apps > Enable development mode`.
 
 1. Clone the repository and change directory:
 ```bash=
@@ -29,9 +37,9 @@ Refer to this [guide](https://docs.rocket.chat/apps-development/getting-started)
 
 ## App Setup
 
-1. With the App installed, and with the `app_secret` provided on the Rocket.Chat ticket service integration setup on rapidpro, go to `Administration > Apps > Tickets`, and paste the `app_secret` on the `App Secret` field, then click `Save Changes`.
+1. With the App installed, and with the `app_secret` provided on the Rocket.Chat ticket service integration setup on rapidpro, go to `Administration > Apps > Tickets App`, and paste the `app_secret` on the `App Secret` field, then click `Save Changes`.
 
-3. Return to rapidpro, and proceed with the integration setup after setting the `App Secret` field. This will automaticaly validate the integration between the App and rapidpro.
+3. Return to rapidpro, and proceed with the integration setup after setting the `App Secret` field. This will automatically validate the integration between the App and rapidpro.
 
 ## API Reference
 
@@ -44,11 +52,19 @@ Content-Type:  application/json
 Authorization: Token PMgASmAH4ktSXG97
 ```
 
+#### All error messages are returned in this pattern:
+
+```json=
+{
+    "error": "error message",
+}
+```
+
 - ### GET /secret.check
     - Description:
         - Match the given secret from `Authorization` header with the App's `App Secret` field.
     - Result:
-        - Status: `204 No Content`
+        - Status: `204 No Content` if succeeded
 
 - ### PUT /settings
 
@@ -60,7 +76,7 @@ Authorization: Token PMgASmAH4ktSXG97
         ```json=
         {
             "webhook": {
-                "url": "https://<host>/mr/tickets/types/rocketchat/<UUID>/event"
+                "url": "https://<host>/mr/tickets/types/rocketchat/event_callback/<UUID>"
             }
         }
         ```
