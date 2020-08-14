@@ -2,7 +2,7 @@ import {ILivechatRoom, IVisitor} from '@rocket.chat/apps-engine/definition/livec
 
 import Department from '../../domain/Department';
 
-export default interface ILiveChatInternalDataSource {
+export default interface ILivechatInternalDataSource {
 
     getDepartmentByName(name: string): Promise<Department | undefined>;
 

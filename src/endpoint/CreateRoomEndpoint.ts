@@ -3,7 +3,7 @@ import {ApiEndpoint, IApiEndpointInfo, IApiRequest} from '@rocket.chat/apps-engi
 import {IApiResponseJSON} from '@rocket.chat/apps-engine/definition/api/IResponse';
 import {IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 
-import ILiveChatRepository from '../data/livechat/ILiveChatRepository';
+import ILivechatRepository from '../data/livechat/ILivechatRepository';
 import LiveChatRepositoryImpl from '../data/livechat/LiveChatRepositoryImpl';
 import IRapidProRemoteDataSource from '../data/rapidpro/IRapidProRemoteDataSource';
 import AppError from '../domain/AppError';
@@ -100,7 +100,7 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             }
 
             // initialize livechat repository
-            const livechatRepo: ILiveChatRepository = new LiveChatRepositoryImpl(
+            const livechatRepo: ILivechatRepository = new LiveChatRepositoryImpl(
                 await InstanceHelper.newDefaultLivechatCacheDataSource(read.getPersistenceReader(), persis),
                 await InstanceHelper.newDefaultLivechatInternalDataSource(modify, read.getLivechatReader()),
                 await InstanceHelper.newDefaultLivechatWebhook(http, read, persis),

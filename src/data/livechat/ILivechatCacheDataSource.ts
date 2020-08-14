@@ -1,6 +1,6 @@
 import Room from '../../domain/Room';
 
-export default interface ILiveChatCacheDataSource {
+export default interface ILivechatCacheDataSource {
 
     getRoomByVisitorToken(token: string): Promise<Room | undefined>;
 
