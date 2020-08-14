@@ -1,11 +1,11 @@
 {
     "devDependencies": {
-        "@rocket.chat/apps-engine": "^1.12.0",
+        "@rocket.chat/apps-engine": "^1.16.0",
         "@types/chai": "^4.2.12",
         "@types/chai-spies": "^1.0.1",
         "@types/faker": "^4.1.12",
-        "@types/mocha": "^8.0.0",
-        "@types/node": "^10.17.27",
+        "@types/mocha": "^8.0.2",
+        "@types/node": "^10.17.28",
         "@types/uuid": "^8.0.0",
         "@types/supertest": "^2.0.10",
         "chai": "^4.2.0",
@@ -15,7 +15,7 @@
         "factory.ts": "^0.5.1",
         "faker": "^4.1.0",
         "fs": "0.0.1-security",
-        "mocha": "^8.0.1",
+        "mocha": "^8.1.1",
         "nyc": "^15.1.0",
         "slugify": "^1.4.5",
         "ts-mockito": "^2.6.1",

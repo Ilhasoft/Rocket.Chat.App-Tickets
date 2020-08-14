@@ -18,8 +18,8 @@ export class CheckSecretEndpoint extends ApiEndpoint {
         persis: IPersistence,
     ): Promise<IApiResponseJSON> {
         try {
-            await RequestHeadersValidator.validate(read, request.headers);
-            return this.json({status: HttpStatusCode.NO_CONTENT});
+            await RequestHeadersValidator.validate(read, request.headers, false);
+            return this.json({status: HttpStatusCode.OK, content: { status: 'ok' }});
         } catch (e) {
             this.app.getLogger().error(e);
 

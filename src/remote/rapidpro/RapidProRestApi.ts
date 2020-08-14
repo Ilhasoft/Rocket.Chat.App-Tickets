@@ -1,7 +1,9 @@
-import { IHttp } from '@rocket.chat/apps-engine/definition/accessors';
-import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
+import {HttpStatusCode, IHttp} from '@rocket.chat/apps-engine/definition/accessors';
+import {IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 
 import IRapidProRemoteDataSource from '../../data/rapidpro/IRapidProRemoteDataSource';
+import RPMessage, { Direction } from '../../domain/RPMessage';
+import DateStringUtils from '../../utils/DateStringUtils';
 
 export default class RapidProRestApi implements IRapidProRemoteDataSource {
 
@@ -12,6 +14,33 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
         private readonly timeout: number,
     ) {
         this.timeout = this.timeout < 5 ? 5 : this.timeout;
+    }
+
+    public async getMessages(contactUUID: string, after: string): Promise<Array<RPMessage>> {
+        const reqOptions = this.requestOptions();
+        reqOptions['params'] = {contact: contactUUID, after};
+
+        const response = await this.http.get(this.baseUrl + '/api/v2/messages.json', reqOptions);
+        if (!response || response.statusCode !== HttpStatusCode.OK) {
+            return [];
+        }
+        const tzOffset = DateStringUtils.getTimezoneOffsetInMinutes(after);
+
+        let hasStartedConversation: boolean = false;
+        const result: Array<RPMessage> = [];
+
+        response.data.results.forEach((message) => {
+            const sentOn = DateStringUtils.format(DateStringUtils.addMinutes(message.sent_on, tzOffset), 'yyyy/MM/dd, hh:mm:ss');
+
+            if (message.direction === Direction.IN) {
+                hasStartedConversation = true;
+            }
+            if (hasStartedConversation) {
+                result.push({direction: message.direction, sentOn, text: message.text} as RPMessage);
+            }
+        });
+
+        return result;
     }
 
     public async startFlow(uuid: string, visitor: IVisitor, extra: any): Promise<void> {
@@ -34,7 +63,7 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
                 'Authorization': `Token ${this.authToken}`,
             },
             // TODO: check timeout parameter
-            // timeout: this.timeout,
+            timeout: this.timeout * 1000,
         };
     }
 

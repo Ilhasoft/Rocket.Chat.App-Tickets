@@ -1,14 +1,15 @@
-import {ILivechatRoom} from '@rocket.chat/apps-engine/definition/livechat';
 import Room from '../../domain/Room';
 
 export default interface ILiveChatCacheDataSource {
 
     getRoomByVisitorToken(token: string): Promise<Room | undefined>;
 
+    getNewVisitorUsername(): Promise<string>;
+
     saveRoom(room: Room): Promise<void>;
 
-    deleteRoom(room: ILivechatRoom): Promise<void>;
+    markRoomAsClosed(room: Room): Promise<void>;
 
-    getNewVisitorUsername(): Promise<string>;
+    deleteRoom(room: Room): Promise<void>;
 
 }
