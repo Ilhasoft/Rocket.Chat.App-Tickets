@@ -2,10 +2,10 @@ import {HttpStatusCode} from '@rocket.chat/apps-engine/definition/accessors';
 import {assert} from 'chai';
 import {anyString, instance, mock, verify, when} from 'ts-mockito';
 
-import ILiveChatCacheDataSource from '../../../src/data/livechat/ILiveChatCacheDataSource';
-import ILiveChatInternalDataSource from '../../../src/data/livechat/ILiveChatInternalDataSource';
-import ILiveChatRepository from '../../../src/data/livechat/ILiveChatRepository';
-import ILiveChatWebhook from '../../../src/data/livechat/ILiveChatWebhook';
+import ILivechatCacheDataSource from '../../../src/data/livechat/ILivechatCacheDataSource';
+import ILivechatInternalDataSource from '../../../src/data/livechat/ILivechatInternalDataSource';
+import ILivechatRepository from '../../../src/data/livechat/ILivechatRepository';
+import ILivechatWebhook from '../../../src/data/livechat/ILivechatWebhook';
 import LiveChatRepositoryImpl from '../../../src/data/livechat/LiveChatRepositoryImpl';
 import AppError from '../../../src/domain/AppError';
 import RPMessage, { Direction } from '../../../src/domain/RPMessage';
@@ -14,19 +14,19 @@ import livechatRoomFactory from '../../factories/LivechatRoomFactory';
 import roomFactory from '../../factories/RoomFactory';
 import visitorFactory from '../../factories/VisitorFactory';
 
-describe('ILiveChatRepository', () => {
+describe('ILivechatRepository', () => {
 
-    let mockedCache: ILiveChatCacheDataSource;
-    let mockedInternal: ILiveChatInternalDataSource;
-    let mockedWebhook: ILiveChatWebhook;
-    let livechatRepo: ILiveChatRepository;
+    let mockedCache: ILivechatCacheDataSource;
+    let mockedInternal: ILivechatInternalDataSource;
+    let mockedWebhook: ILivechatWebhook;
+    let livechatRepo: ILivechatRepository;
 
     describe('#getDepartmentByName()', () => {
 
         beforeEach(() => {
-            mockedCache = mock<ILiveChatCacheDataSource>();
-            mockedInternal = mock<ILiveChatInternalDataSource>();
-            mockedWebhook = mock<ILiveChatWebhook>();
+            mockedCache = mock<ILivechatCacheDataSource>();
+            mockedInternal = mock<ILivechatInternalDataSource>();
+            mockedWebhook = mock<ILivechatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -43,9 +43,9 @@ describe('ILiveChatRepository', () => {
     describe('#createVisitor()', () => {
 
         beforeEach(() => {
-            mockedCache = mock<ILiveChatCacheDataSource>();
-            mockedInternal = mock<ILiveChatInternalDataSource>();
-            mockedWebhook = mock<ILiveChatWebhook>();
+            mockedCache = mock<ILivechatCacheDataSource>();
+            mockedInternal = mock<ILivechatInternalDataSource>();
+            mockedWebhook = mock<ILivechatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -157,9 +157,9 @@ describe('ILiveChatRepository', () => {
     describe('#getRoomByVisitorToken()', () => {
 
         beforeEach(() => {
-            mockedCache = mock<ILiveChatCacheDataSource>();
-            mockedInternal = mock<ILiveChatInternalDataSource>();
-            mockedWebhook = mock<ILiveChatWebhook>();
+            mockedCache = mock<ILivechatCacheDataSource>();
+            mockedInternal = mock<ILivechatInternalDataSource>();
+            mockedWebhook = mock<ILivechatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -192,9 +192,9 @@ describe('ILiveChatRepository', () => {
     describe('#createRoom()', () => {
 
         beforeEach(() => {
-            mockedCache = mock<ILiveChatCacheDataSource>();
-            mockedInternal = mock<ILiveChatInternalDataSource>();
-            mockedWebhook = mock<ILiveChatWebhook>();
+            mockedCache = mock<ILivechatCacheDataSource>();
+            mockedInternal = mock<ILivechatInternalDataSource>();
+            mockedWebhook = mock<ILivechatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -280,9 +280,9 @@ describe('ILiveChatRepository', () => {
     describe('#eventCloseRoom()', () => {
 
         beforeEach(() => {
-            mockedCache = mock<ILiveChatCacheDataSource>();
-            mockedInternal = mock<ILiveChatInternalDataSource>();
-            mockedWebhook = mock<ILiveChatWebhook>();
+            mockedCache = mock<ILivechatCacheDataSource>();
+            mockedInternal = mock<ILivechatInternalDataSource>();
+            mockedWebhook = mock<ILivechatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -312,9 +312,9 @@ describe('ILiveChatRepository', () => {
     describe('#endpointCloseRoom()', () => {
 
         beforeEach(() => {
-            mockedCache = mock<ILiveChatCacheDataSource>();
-            mockedInternal = mock<ILiveChatInternalDataSource>();
-            mockedWebhook = mock<ILiveChatWebhook>();
+            mockedCache = mock<ILivechatCacheDataSource>();
+            mockedInternal = mock<ILivechatInternalDataSource>();
+            mockedWebhook = mock<ILivechatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -351,9 +351,9 @@ describe('ILiveChatRepository', () => {
 
     describe('#sendAgentMessage()', () => {
         beforeEach(() => {
-            mockedCache = mock<ILiveChatCacheDataSource>();
-            mockedInternal = mock<ILiveChatInternalDataSource>();
-            mockedWebhook = mock<ILiveChatWebhook>();
+            mockedCache = mock<ILivechatCacheDataSource>();
+            mockedInternal = mock<ILivechatInternalDataSource>();
+            mockedWebhook = mock<ILivechatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -372,9 +372,9 @@ describe('ILiveChatRepository', () => {
     describe('#sendVisitorMessage()', () => {
 
         beforeEach(() => {
-            mockedCache = mock<ILiveChatCacheDataSource>();
-            mockedInternal = mock<ILiveChatInternalDataSource>();
-            mockedWebhook = mock<ILiveChatWebhook>();
+            mockedCache = mock<ILivechatCacheDataSource>();
+            mockedInternal = mock<ILivechatInternalDataSource>();
+            mockedWebhook = mock<ILivechatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 
@@ -405,9 +405,9 @@ describe('ILiveChatRepository', () => {
     describe('#sendChatbotHistory()', () => {
 
         beforeEach(() => {
-            mockedCache = mock<ILiveChatCacheDataSource>();
-            mockedInternal = mock<ILiveChatInternalDataSource>();
-            mockedWebhook = mock<ILiveChatWebhook>();
+            mockedCache = mock<ILivechatCacheDataSource>();
+            mockedInternal = mock<ILivechatInternalDataSource>();
+            mockedWebhook = mock<ILivechatWebhook>();
             livechatRepo = new LiveChatRepositoryImpl(instance(mockedCache), instance(mockedInternal), instance(mockedWebhook));
         });
 

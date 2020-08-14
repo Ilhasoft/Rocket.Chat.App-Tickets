@@ -2,10 +2,10 @@ import {ILivechatRead, IModify} from '@rocket.chat/apps-engine/definition/access
 import {ILivechatRoom, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 import {IUser} from '@rocket.chat/apps-engine/definition/users';
 
-import ILiveChatInternalDataSource from '../../data/livechat/ILiveChatInternalDataSource';
+import ILivechatInternalDataSource from '../../data/livechat/ILivechatInternalDataSource';
 import Department from '../../domain/Department';
 
-export default class LiveChatAppsEngine implements ILiveChatInternalDataSource {
+export default class LiveChatAppsEngine implements ILivechatInternalDataSource {
 
     constructor(
         private readonly modify: IModify,

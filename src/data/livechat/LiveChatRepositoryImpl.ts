@@ -7,17 +7,17 @@ import Department from '../../domain/Department';
 import Room from '../../domain/Room';
 import RPMessage, {Direction} from '../../domain/RPMessage';
 import Visitor from '../../domain/Visitor';
-import ILiveChatCacheDataSource from './ILiveChatCacheDataSource';
-import ILiveChatInternalDataSource from './ILiveChatInternalDataSource';
-import ILiveChatRepository from './ILiveChatRepository';
-import ILiveChatWebhook from './ILiveChatWebhook';
+import ILivechatCacheDataSource from './ILivechatCacheDataSource';
+import ILivechatInternalDataSource from './ILivechatInternalDataSource';
+import ILivechatRepository from './ILivechatRepository';
+import ILivechatWebhook from './ILivechatWebhook';
 
-export default class LiveChatRepositoryImpl implements ILiveChatRepository {
+export default class LiveChatRepositoryImpl implements ILivechatRepository {
 
     constructor(
-        private readonly cacheDataSource: ILiveChatCacheDataSource,
-        private readonly internalDataSource: ILiveChatInternalDataSource,
-        private readonly webhook: ILiveChatWebhook,
+        private readonly cacheDataSource: ILivechatCacheDataSource,
+        private readonly internalDataSource: ILivechatInternalDataSource,
+        private readonly webhook: ILivechatWebhook,
     ) {
     }
 

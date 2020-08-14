@@ -6,7 +6,7 @@ import Room from '../../domain/Room';
 import RPMessage from '../../domain/RPMessage';
 import Visitor from '../../domain/Visitor';
 
-export default interface ILiveChatRepository {
+export default interface ILivechatRepository {
 
     getDepartmentByName(name: string): Promise<Department | undefined>;
 

@@ -14,7 +14,7 @@ import {ILivechatRoom, IPostLivechatRoomClosed, IVisitor} from '@rocket.chat/app
 import {IMessage, IPostMessageSent} from '@rocket.chat/apps-engine/definition/messages';
 import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
 import {RoomType} from '@rocket.chat/apps-engine/definition/rooms';
-import ILiveChatRepository from './src/data/livechat/ILiveChatRepository';
+import ILivechatRepository from './src/data/livechat/ILivechatRepository';
 import LiveChatRepositoryImpl from './src/data/livechat/LiveChatRepositoryImpl';
 import {CheckSecretEndpoint} from './src/endpoint/CheckSecretEndpoint';
 import {CloseRoomEndpoint} from './src/endpoint/CloseRoomEndpoint';
@@ -69,7 +69,7 @@ export class RapidProApp extends App implements IPostLivechatRoomClosed, IPostMe
 
         try {
             // initialize livechat repository
-            const livechatRepo: ILiveChatRepository = new LiveChatRepositoryImpl(
+            const livechatRepo: ILivechatRepository = new LiveChatRepositoryImpl(
                 await InstanceHelper.newDefaultLivechatCacheDataSource(read.getPersistenceReader(), persistence),
                 await InstanceHelper.newDefaultLivechatInternalDataSource(modify, read.getLivechatReader()),
                 await InstanceHelper.newDefaultLivechatWebhook(http, read, persistence),
@@ -99,7 +99,7 @@ export class RapidProApp extends App implements IPostLivechatRoomClosed, IPostMe
 
         try {
             // initialize livechat repository
-            const livechatRepo: ILiveChatRepository = new LiveChatRepositoryImpl(
+            const livechatRepo: ILivechatRepository = new LiveChatRepositoryImpl(
                 await InstanceHelper.newDefaultLivechatCacheDataSource(read.getPersistenceReader(), persistence),
                 await InstanceHelper.newDefaultLivechatInternalDataSource({} as IModify, read.getLivechatReader()),
                 await InstanceHelper.newDefaultLivechatWebhook(http, read, persistence),

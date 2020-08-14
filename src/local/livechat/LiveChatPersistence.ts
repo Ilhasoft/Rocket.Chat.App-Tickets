@@ -1,11 +1,11 @@
 import {IPersistence, IPersistenceRead} from '@rocket.chat/apps-engine/definition/accessors';
 import {RocketChatAssociationModel, RocketChatAssociationRecord} from '@rocket.chat/apps-engine/definition/metadata';
 
-import ILiveChatCacheDataSource from '../../data/livechat/ILiveChatCacheDataSource';
+import ILivechatCacheDataSource from '../../data/livechat/ILivechatCacheDataSource';
 import Room from '../../domain/Room';
 import PersistenceUtils from '../../utils/PersistenceUtils';
 
-export default class LiveChatPersistence implements ILiveChatCacheDataSource {
+export default class LiveChatPersistence implements ILivechatCacheDataSource {
 
     private static readonly ASSOC_VISITOR_COUNT = new RocketChatAssociationRecord(
         RocketChatAssociationModel.MISC,

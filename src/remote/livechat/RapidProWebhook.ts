@@ -1,13 +1,13 @@
 import {HttpStatusCode, IHttp, IRead} from '@rocket.chat/apps-engine/definition/accessors';
 import {IMessageAttachment} from '@rocket.chat/apps-engine/definition/messages';
 
-import ILiveChatWebhook from '../../data/livechat/ILiveChatWebhook';
+import ILivechatWebhook from '../../data/livechat/ILivechatWebhook';
 import Room from '../../domain/Room';
 import {joypixels} from '../../lib/joypixels/6_0_0/joypixels';
 import {RC_SERVER_URL} from '../../settings/Constants';
 import AttachmentUtils from '../../utils/AttachmentUtils';
 
-export default class RapidProWebhook implements ILiveChatWebhook {
+export default class RapidProWebhook implements ILivechatWebhook {
 
     constructor(
         private readonly read: IRead,

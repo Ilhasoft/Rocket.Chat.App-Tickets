@@ -6,6 +6,7 @@
         "@types/faker": "^4.1.12",
         "@types/mocha": "^8.0.2",
         "@types/node": "^10.17.28",
+        "@types/uuid": "^8.0.0",
         "@types/supertest": "^2.0.10",
         "chai": "^4.2.0",
         "chai-factories": "^0.1.0",
@@ -13,14 +14,18 @@
         "chai-spies": "^1.0.0",
         "factory.ts": "^0.5.1",
         "faker": "^4.1.0",
+        "fs": "0.0.1-security",
         "mocha": "^8.1.1",
         "nyc": "^15.1.0",
+        "slugify": "^1.4.5",
         "ts-mockito": "^2.6.1",
         "ts-node": "^8.10.2",
         "tslint": "^5.10.0",
-        "typescript": "^2.9.2"
+        "typescript": "^2.9.2",
+        "uuid": "^8.3.0"
     },
     "scripts": {
+        "publish": "node ./scripts/branding.js && rc-apps package && rc-apps submit",
         "test-dev": "mocha -r ts-node/register test/**/*.test.ts; exit 0",
         "coverage": "nyc npm run test-dev"
     }
