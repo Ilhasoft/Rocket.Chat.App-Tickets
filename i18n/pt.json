@@ -1,0 +1,5 @@
+{
+    "config_app_secret": "Segredo do App",
+    "config_rapidpro_auth_token": "Token de Autorização RapidPro",
+    "config_request_timeout": "Tempo de Espera de Requisição"
+}

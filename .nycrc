@@ -12,7 +12,8 @@
     "node_modules/**",
     "**/*.d.ts",
     "**/*.test.ts",
-    "app/settings/**",
+    "src/settings/Constants.ts",
+    "src/utils/Constants.ts",
     "test/factories/**"
   ],
   "sourceMap": true,

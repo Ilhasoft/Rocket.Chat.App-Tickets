@@ -1,7 +1,9 @@
 import {ILivechatRoom, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
 
+import {IMessageAttachment} from '@rocket.chat/apps-engine/definition/messages';
 import Department from '../../domain/Department';
 import Room from '../../domain/Room';
+import RPMessage from '../../domain/RPMessage';
 import Visitor from '../../domain/Visitor';
 
 export default interface ILiveChatRepository {
@@ -14,10 +16,14 @@ export default interface ILiveChatRepository {
 
     createRoom(ticketID: string, contactUUID: string, visitor: IVisitor): Promise<ILivechatRoom>;
 
-    eventCloseRoom(room: ILivechatRoom): Promise<void>;
+    eventCloseRoom(room: Room): Promise<boolean>;
 
     endpointCloseRoom(visitorToken: string): Promise<void>;
 
-    sendMessage(text: string, room: ILivechatRoom): Promise<string>;
+    sendAgentMessage(room: Room, message?: string, attachments?: Array<IMessageAttachment>): Promise<void>;
+
+    sendVisitorMessage(text: string, room: Room): Promise<string>;
+
+    sendChatbotHistory(messages: Array<RPMessage>, room: ILivechatRoom): Promise<string>;
 
 }

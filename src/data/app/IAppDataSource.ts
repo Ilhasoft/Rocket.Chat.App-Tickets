@@ -4,4 +4,8 @@ export default interface IAppDataSource {
 
     setCallbackUrl(url: string): Promise<void>;
 
+    getRPHostUrl(): Promise<string | undefined>;
+
+    setRPHostUrl(host: string): Promise<void>;
+
 }

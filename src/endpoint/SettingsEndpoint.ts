@@ -27,6 +27,31 @@ export class SettingsEndpoint extends ApiEndpoint {
         },
     };
 
+    public async get(
+        request: IApiRequest,
+        endpoint: IApiEndpointInfo,
+        read: IRead,
+        modify: IModify,
+        http: IHttp,
+        persis: IPersistence,
+    ): Promise<IApiResponseJSON> {
+        try {
+            await RequestHeadersValidator.validate(read, request.headers, false);
+
+            const appDataSource: IAppDataSource = new AppPersistence(read.getPersistenceReader(), persis);
+            const callbackUrl = await appDataSource.getCallbackUrl();
+
+            return this.json({status: HttpStatusCode.OK, content: {webhook: {url: callbackUrl}}});
+        } catch (e) {
+            this.app.getLogger().error(e);
+
+            if (e.constructor.name === AppError.name) {
+                return this.json({status: e.statusCode, content: {error: e.message}});
+            }
+            return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
+        }
+    }
+
     public async put(
         request: IApiRequest,
         endpoint: IApiEndpointInfo,

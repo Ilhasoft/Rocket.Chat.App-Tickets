@@ -11,4 +11,10 @@ export default class RequestBodyValidator {
         }
     }
 
+    public static async validateDateString(date: string) {
+        if (date) {
+            new Date(date).toISOString();
+        }
+    }
+
 }

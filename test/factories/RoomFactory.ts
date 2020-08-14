@@ -8,6 +8,7 @@ const roomFactory = Factory.Sync.makeFactory<Room>({
     ticketID: faker.random.uuid(),
     contactUUID: faker.random.uuid(),
     room: livechatRoomFactory.build(),
+    closed: false,
 });
 
 export default roomFactory;
