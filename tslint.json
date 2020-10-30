@@ -12,6 +12,7 @@
           "ignore-pattern": "^import | *export .*? {"
       }],
       "no-string-literal": false,
-      "interface-name": false
+      "interface-name": false,
+      "no-unused-expression": [true, "allow-fast-null-checks"]
     }
   }

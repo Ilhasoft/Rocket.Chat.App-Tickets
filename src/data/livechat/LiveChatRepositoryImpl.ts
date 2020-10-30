@@ -3,6 +3,7 @@ import {ILivechatRoom, IVisitor} from '@rocket.chat/apps-engine/definition/livec
 
 import {IMessageAttachment} from '@rocket.chat/apps-engine/definition/messages';
 import AppError from '../../domain/AppError';
+import Attachment from '../../domain/Attachment';
 import Department from '../../domain/Department';
 import Room from '../../domain/Room';
 import RPMessage, {Direction} from '../../domain/RPMessage';
@@ -99,12 +100,15 @@ export default class LiveChatRepositoryImpl implements ILivechatRepository {
         return await this.webhook.onAgentMessage(room, message, attachments);
     }
 
-    public async sendVisitorMessage(text: string, room: Room): Promise<string> {
+    public async sendVisitorMessage(room: Room, text: string, attachments: Array<Attachment>): Promise<string> {
         if (room.closed) {
             await this.eventCloseRoom(room);
             return '';
         } else {
-            return await this.internalDataSource.sendMessage(text, room.room);
+            if (!text && !attachments) {
+                throw new AppError(`Could not send message with empty text and attachments`, HttpStatusCode.BAD_REQUEST);
+            }
+            return await this.internalDataSource.sendMessage(room.room, text, attachments);
         }
     }
 
@@ -112,7 +116,7 @@ export default class LiveChatRepositoryImpl implements ILivechatRepository {
         if (messages.length === 0) {
             return '';
         }
-        return await this.internalDataSource.sendMessage(this.buildChatbotHistoryMessage(messages), room);
+        return await this.internalDataSource.sendMessage(room, this.buildChatbotHistoryMessage(messages));
     }
 
     private buildChatbotHistoryMessage(messages: Array<RPMessage>): string {
