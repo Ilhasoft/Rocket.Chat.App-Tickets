@@ -8,7 +8,7 @@
         "homepage": "https://github.com/Ilhasoft/",
         "support": "https://github.com/Ilhasoft/"
     },
-    "name": "RapidPro",
+    "name": "Rapidpro Ticketer",
     "nameSlug": "rapidpro",
     "classFile": "RapidProApp.ts",
     "description": "Integration between Omnichannel and RapidPro platform"

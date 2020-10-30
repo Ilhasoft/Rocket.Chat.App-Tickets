@@ -1,4 +1,5 @@
 import {ILivechatRoom, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
+import Attachment from '../../domain/Attachment';
 
 import Department from '../../domain/Department';
 
@@ -14,6 +15,6 @@ export default interface ILivechatInternalDataSource {
 
     closeRoom(room: ILivechatRoom): Promise<void>;
 
-    sendMessage(text: string, room: ILivechatRoom): Promise<string>;
+    sendMessage(room: ILivechatRoom, text?: string, attachments?: Array<Attachment>): Promise<string>;
 
 }

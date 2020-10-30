@@ -1,8 +1,10 @@
-import {ILivechatRead, IModify} from '@rocket.chat/apps-engine/definition/accessors';
-import {ILivechatRoom, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
-import {IUser} from '@rocket.chat/apps-engine/definition/users';
+import { ILivechatRead, IModify } from '@rocket.chat/apps-engine/definition/accessors';
+import { ILivechatRoom, IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
+import { IMessageAttachment } from '@rocket.chat/apps-engine/definition/messages';
+import { IUser } from '@rocket.chat/apps-engine/definition/users';
 
 import ILivechatInternalDataSource from '../../data/livechat/ILivechatInternalDataSource';
+import Attachment from '../../domain/Attachment';
 import Department from '../../domain/Department';
 
 export default class LiveChatAppsEngine implements ILivechatInternalDataSource {
@@ -35,11 +37,37 @@ export default class LiveChatAppsEngine implements ILivechatInternalDataSource {
         await this.modify.getUpdater().getLivechatUpdater().closeRoom(room, '');
     }
 
-    public async sendMessage(text: string, room: ILivechatRoom): Promise<string> {
+    public async sendMessage(room: ILivechatRoom, text?: string, attachments?: Array<Attachment>): Promise<string> {
         const livechatMessageBuilder = this.modify.getCreator().startLivechatMessage()
             .setRoom(room)
-            .setVisitor(room.visitor)
-            .setText(text);
+            .setVisitor(room.visitor);
+
+        text && livechatMessageBuilder.setText(text);
+
+        if (attachments) {
+            const messageAttachments: Array<IMessageAttachment> = [];
+            attachments.map((attachment) => {
+                switch (attachment.type.split('/')[0]) {
+                    case 'image':
+                        messageAttachments.push({ imageUrl: attachment.url });
+                        break;
+                    case 'audio':
+                        messageAttachments.push({ audioUrl: attachment.url });
+                        break;
+                    case 'video':
+                        messageAttachments.push({ videoUrl: attachment.url });
+                        break;
+                    default: // TODO: wait for appsEngine support the creation of documents attachments
+                        if (text) {
+                            livechatMessageBuilder.setText(`${text}\n${attachment.url}`);
+                        } else {
+                            livechatMessageBuilder.setText(attachment.url);
+                        }
+
+                }
+            });
+            livechatMessageBuilder.setAttachments(messageAttachments);
+        }
 
         return await this.modify.getCreator().finish(livechatMessageBuilder);
     }
