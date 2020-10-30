@@ -381,23 +381,40 @@ describe('ILivechatRepository', () => {
         it(`should close the visitor room and do not send the visitor message`, async () => {
             const text = 'Can you help me?';
             const room = roomFactory.build({closed: true});
+            const attachments = [];
 
             when(mockedWebhook.onCloseRoom(room)).thenResolve(false);
             when(mockedCache.markRoomAsClosed(room)).thenResolve();
 
-            const messageId = await livechatRepo.sendVisitorMessage(text, room);
+            const messageId = await livechatRepo.sendVisitorMessage(room, text, attachments);
             verify(mockedWebhook.onCloseRoom(room)).once();
             assert.equal(messageId, '');
+        });
+
+        it(`should throw an error when text and attachments are undefined`, async () => {
+            const text = undefined;
+            const room = roomFactory.build();
+            const attachments = undefined;
+
+            try {
+                await livechatRepo.sendVisitorMessage(room, text, attachments);
+                assert.fail('should have thrown an error');
+            } catch (error) {
+                assert.equal(error.constructor.name, AppError.name);
+                assert.equal(error.message, `Could not send message with empty text and attachments`);
+                assert.equal(error.statusCode, HttpStatusCode.BAD_REQUEST);
+            }
         });
 
         it(`should send the visitor message`, async () => {
             const text = 'Can you help me?';
             const room = roomFactory.build();
+            const attachments = [];
 
-            when(mockedInternal.sendMessage(text, room.room)).thenResolve('2hSb3rKy8fn5uwWd');
+            when(mockedInternal.sendMessage(room.room, text, attachments)).thenResolve('2hSb3rKy8fn5uwWd');
 
-            const messageId = await livechatRepo.sendVisitorMessage(text, room);
-            verify(mockedInternal.sendMessage(text, room.room)).once();
+            const messageId = await livechatRepo.sendVisitorMessage(room, text, attachments);
+            verify(mockedInternal.sendMessage(room.room, text, attachments)).once();
             assert.equal(messageId, '2hSb3rKy8fn5uwWd');
         });
     });
@@ -443,10 +460,10 @@ describe('ILivechatRepository', () => {
             `\n> :robot: [${messages[1].sentOn}]: ${messages[1].text}` +
             `\n> :bust_in_silhouette: [${messages[0].sentOn}]: \`${messages[0].text}\``;
 
-            when(mockedInternal.sendMessage(history, room)).thenResolve('2hSb3rKy8fn5uwWd');
+            when(mockedInternal.sendMessage(room, history)).thenResolve('2hSb3rKy8fn5uwWd');
 
             const messageId = await livechatRepo.sendChatbotHistory(messages, room);
-            verify(mockedInternal.sendMessage(history, room)).once();
+            verify(mockedInternal.sendMessage(room, history)).once();
         });
 
     });
