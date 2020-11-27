@@ -2,6 +2,7 @@ import {HttpStatusCode} from '@rocket.chat/apps-engine/definition/accessors';
 import {assert} from 'chai';
 import {anyString, instance, mock, verify, when} from 'ts-mockito';
 
+import 'mocha';
 import ILivechatCacheDataSource from '../../../src/data/livechat/ILivechatCacheDataSource';
 import ILivechatInternalDataSource from '../../../src/data/livechat/ILivechatInternalDataSource';
 import ILivechatRepository from '../../../src/data/livechat/ILivechatRepository';

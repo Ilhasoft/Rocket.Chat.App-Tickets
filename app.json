@@ -1,6 +1,6 @@
 {
-    "id": "29542a4b-5a89-4f27-872b-5f8091899f7b",
-    "version": "1.0.0",
+    "id": "02c2b89b-f8c4-446c-abe0-b97c5e0d4649",
+    "version": "1.0.1",
     "requiredApiVersion": "^1.16.0",
     "iconFile": "icon.png",
     "author": {
@@ -8,8 +8,12 @@
         "homepage": "https://github.com/Ilhasoft/",
         "support": "https://github.com/Ilhasoft/"
     },
-    "name": "Rapidpro Ticketer",
-    "nameSlug": "rapidpro",
+    "name": "Push Tickets",
+    "nameSlug": "push-tickets",
     "classFile": "RapidProApp.ts",
-    "description": "Integration between Omnichannel and RapidPro platform"
+    "description": "Integration between Omnichannel and Push platform ticketing service",
+    "implements": [
+        "IPostLivechatRoomClosed",
+        "IPostMessageSent"
+    ]
 }
