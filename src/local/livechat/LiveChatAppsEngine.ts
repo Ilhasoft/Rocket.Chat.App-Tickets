@@ -26,6 +26,14 @@ export default class LiveChatAppsEngine implements ILivechatInternalDataSource {
 
     public async createVisitor(visitor: IVisitor): Promise<IVisitor> {
         visitor.id = await this.modify.getCreator().getLivechatCreator().createVisitor(visitor);
+
+        if (visitor.customFields) {
+            const entries = Object.entries(visitor.customFields);
+            entries.map(async (field) => {
+                await this.modify.getUpdater().getLivechatUpdater().setCustomFields(visitor.token, field[0], field[1], true);
+            });
+        }
+
         return visitor;
     }
 

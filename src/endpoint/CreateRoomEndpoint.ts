@@ -118,15 +118,6 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             }
 
             const createdVisitor = await livechatRepo.createVisitor(visitor);
-
-            // TODO: this is a workaround, need to modify to use future appsEngine customFields updater
-            const siteUrl = await read.getEnvironmentReader().getServerSettings().getValueById(RC_SERVER_URL);
-            const payload = {
-                token: createdVisitor.visitor.token,
-                customFields: this.createCustomFieldsArray(request.content.visitor.customFields),
-            };
-            await http.post(`${siteUrl}/api/v1/livechat/custom.fields`, { data: payload});
-
             const room = await livechatRepo.createRoom(
                 request.content.ticketID,
                 request.content.visitor.contactUUID,
@@ -168,18 +159,6 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             }
             return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
         }
-    }
-
-    // TODO: remove when future appsEngine customFields updater is available
-    private createCustomFieldsArray(customFields: {[key: string]: any}): Array<{[key: string]: any}> {
-        const entries = Object.entries(customFields);
-        return entries.map((field) => {
-            return {
-                key: field[0],
-                value: field[1],
-                overwrite: true,
-            };
-        });
     }
 
 }
