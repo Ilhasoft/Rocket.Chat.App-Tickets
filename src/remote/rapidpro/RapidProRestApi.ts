@@ -1,8 +1,8 @@
-import {HttpStatusCode, IHttp} from '@rocket.chat/apps-engine/definition/accessors';
-import {IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
+import { HttpStatusCode, IHttp } from '@rocket.chat/apps-engine/definition/accessors';
+import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 
 import IRapidProRemoteDataSource from '../../data/rapidpro/IRapidProRemoteDataSource';
-import RPMessage, { Direction } from '../../domain/RPMessage';
+import RPMessage from '../../domain/RPMessage';
 import DateStringUtils from '../../utils/DateStringUtils';
 
 export default class RapidProRestApi implements IRapidProRemoteDataSource {
@@ -18,7 +18,7 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
 
     public async getMessages(contactUUID: string, after: string): Promise<Array<RPMessage>> {
         const reqOptions = this.requestOptions();
-        reqOptions['params'] = {contact: contactUUID, after};
+        reqOptions['params'] = { contact: contactUUID, after };
 
         const response = await this.http.get(this.baseUrl + '/api/v2/messages.json', reqOptions);
         if (!response || response.statusCode !== HttpStatusCode.OK) {
@@ -26,17 +26,16 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
         }
         const tzOffset = DateStringUtils.getTimezoneOffsetInMinutes(after);
 
-        let hasStartedConversation: boolean = false;
         const result: Array<RPMessage> = [];
 
         response.data.results.forEach((message) => {
-            const sentOn = DateStringUtils.format(DateStringUtils.addMinutes(message.sent_on, tzOffset), 'yyyy/MM/dd, hh:mm:ss');
+            if (message.status !== 'errored') {
+                const sentOn = DateStringUtils.format(DateStringUtils.addMinutes(message.sent_on, tzOffset), 'dd/MM/yyyy, hh:mm');
 
-            if (message.direction === Direction.IN) {
-                hasStartedConversation = true;
-            }
-            if (hasStartedConversation) {
-                result.push({direction: message.direction, sentOn, text: message.text} as RPMessage);
+                message.text && result.push({ direction: message.direction, sentOn, text: message.text } as RPMessage);
+                message.attachments.forEach((attachment) => {
+                    result.push({ direction: message.direction, sentOn, text: attachment.url } as RPMessage);
+                });
             }
         });
 
@@ -62,7 +61,6 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
                 'Content-Type': 'application/json',
                 'Authorization': `Token ${this.authToken}`,
             },
-            // TODO: check timeout parameter
             timeout: this.timeout * 1000,
         };
     }

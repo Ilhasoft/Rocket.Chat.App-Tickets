@@ -8,21 +8,29 @@ import {
     IPersistence,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
-import {ApiSecurity, ApiVisibility, IApi} from '@rocket.chat/apps-engine/definition/api';
-import {App} from '@rocket.chat/apps-engine/definition/App';
-import {ILivechatRoom, IPostLivechatRoomClosed, IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
-import {IMessage, IPostMessageSent} from '@rocket.chat/apps-engine/definition/messages';
-import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
-import {RoomType} from '@rocket.chat/apps-engine/definition/rooms';
+import { ApiSecurity, ApiVisibility, IApi } from '@rocket.chat/apps-engine/definition/api';
+import { App } from '@rocket.chat/apps-engine/definition/App';
+import { ILivechatRoom, IPostLivechatRoomClosed, IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
+import { IMessage, IPostMessageSent } from '@rocket.chat/apps-engine/definition/messages';
+import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
+import { RoomType } from '@rocket.chat/apps-engine/definition/rooms';
+
 import ILivechatRepository from './src/data/livechat/ILivechatRepository';
 import LiveChatRepositoryImpl from './src/data/livechat/LiveChatRepositoryImpl';
-import {CheckSecretEndpoint} from './src/endpoint/CheckSecretEndpoint';
-import {CloseRoomEndpoint} from './src/endpoint/CloseRoomEndpoint';
-import {CreateRoomEndpoint} from './src/endpoint/CreateRoomEndpoint';
+import IRapidProRemoteDataSource from './src/data/rapidpro/IRapidProRemoteDataSource';
+import { CheckSecretEndpoint } from './src/endpoint/CheckSecretEndpoint';
+import { CloseRoomEndpoint } from './src/endpoint/CloseRoomEndpoint';
+import { CreateRoomEndpoint } from './src/endpoint/CreateRoomEndpoint';
 import InstanceHelper from './src/endpoint/helpers/InstanceHelper';
-import {SettingsEndpoint} from './src/endpoint/SettingsEndpoint';
-import {VisitorMessageEndpoint} from './src/endpoint/VisitorMessageEndpoint';
-import {APP_SETTINGS} from './src/settings/Constants';
+import { SettingsEndpoint } from './src/endpoint/SettingsEndpoint';
+import { VisitorMessageEndpoint } from './src/endpoint/VisitorMessageEndpoint';
+import RapidProRestApi from './src/remote/rapidpro/RapidProRestApi';
+import {
+    APP_SETTINGS,
+    CONFIG_HISTORY_TIME,
+    CONFIG_RAPIDPRO_AUTH_TOKEN,
+    CONFIG_REQUEST_TIMEOUT,
+} from './src/settings/Constants';
 
 export class RapidProApp extends App implements IPostLivechatRoomClosed, IPostMessageSent {
 
@@ -47,6 +55,40 @@ export class RapidProApp extends App implements IPostLivechatRoomClosed, IPostMe
 
     public async extendConfiguration(configuration: IConfigurationExtend): Promise<void> {
         APP_SETTINGS.forEach((setting) => configuration.settings.provideSetting(setting));
+
+        await configuration.scheduler.registerProcessors([
+            {
+                id: 'send-history',
+                processor: async (job, read, modify, http, persis) => {
+                    const rpHostUrl = job.rpHostUrl;
+                    const rpAuthToken = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_RAPIDPRO_AUTH_TOKEN);
+                    const reqTimeout = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_REQUEST_TIMEOUT);
+                    const historyTime = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_HISTORY_TIME);
+
+                    const after = new Date();
+                    after.setHours(after.getHours() - historyTime);
+
+                    const rapidProDataSource: IRapidProRemoteDataSource = new RapidProRestApi(
+                        http,
+                        rpHostUrl,
+                        rpAuthToken,
+                        reqTimeout ? reqTimeout : 5,
+                    );
+                    const messages = await rapidProDataSource.getMessages(
+                        job.contactUUID,
+                        after.toISOString(),
+                    );
+
+                    const livechatRepo = new LiveChatRepositoryImpl(
+                        await InstanceHelper.newDefaultLivechatCacheDataSource(read.getPersistenceReader(), persis),
+                        await InstanceHelper.newDefaultLivechatInternalDataSource(modify, read.getLivechatReader()),
+                        await InstanceHelper.newDefaultLivechatWebhook(http, read, persis),
+                    );
+                    await livechatRepo.sendChatbotHistory(messages, job.room);
+                },
+            },
+        ]);
+
     }
 
     // TODO: change to an event that is only for livechat agents messages when it's available
