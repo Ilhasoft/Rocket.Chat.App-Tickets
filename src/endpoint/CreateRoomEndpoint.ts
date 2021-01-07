@@ -1,16 +1,13 @@
-import {HttpStatusCode, IHttp, IModify, IPersistence, IRead} from '@rocket.chat/apps-engine/definition/accessors';
-import {ApiEndpoint, IApiEndpointInfo, IApiRequest} from '@rocket.chat/apps-engine/definition/api';
-import {IApiResponseJSON} from '@rocket.chat/apps-engine/definition/api/IResponse';
-import {IVisitor} from '@rocket.chat/apps-engine/definition/livechat';
+import { HttpStatusCode, IHttp, IModify, IPersistence, IRead } from '@rocket.chat/apps-engine/definition/accessors';
+import { ApiEndpoint, IApiEndpointInfo, IApiRequest } from '@rocket.chat/apps-engine/definition/api';
+import { IApiResponseJSON } from '@rocket.chat/apps-engine/definition/api/IResponse';
+import { IVisitor } from '@rocket.chat/apps-engine/definition/livechat';
 
 import ILivechatRepository from '../data/livechat/ILivechatRepository';
 import LiveChatRepositoryImpl from '../data/livechat/LiveChatRepositoryImpl';
-import IRapidProRemoteDataSource from '../data/rapidpro/IRapidProRemoteDataSource';
 import AppError from '../domain/AppError';
 import AppPersistence from '../local/app/AppPersistence';
-import RapidProRestApi from '../remote/rapidpro/RapidProRestApi';
-import {CONFIG_RAPIDPRO_AUTH_TOKEN, CONFIG_REQUEST_TIMEOUT, RC_SERVER_URL} from '../settings/Constants';
-import {PATTERN_UUID} from '../utils/Constants';
+import { PATTERN_UUID } from '../utils/Constants';
 import RequestBodyValidator from '../utils/RequestBodyValidator';
 import RequestHeadersValidator from '../utils/RequestHeadersValidator';
 import InstanceHelper from './helpers/InstanceHelper';
@@ -30,10 +27,6 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             },
         },
         'priority': {
-            presence: false,
-            type: 'string',
-        },
-        'sessionStart': {
             presence: false,
             type: 'string',
         },
@@ -94,11 +87,6 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             await RequestHeadersValidator.validate(read, request.headers);
             await RequestBodyValidator.validate(this.bodyConstraints, request.content);
 
-            const sessionStart = request.content.sessionStart;
-            if (sessionStart) {
-                await RequestBodyValidator.validateDateString(sessionStart);
-            }
-
             // initialize livechat repository
             const livechatRepo: ILivechatRepository = new LiveChatRepositoryImpl(
                 await InstanceHelper.newDefaultLivechatCacheDataSource(read.getPersistenceReader(), persis),
@@ -110,54 +98,36 @@ export class CreateRoomEndpoint extends ApiEndpoint {
             const visitor = request.content.visitor as IVisitor;
             const email = request.content.visitor.email;
             if (email) {
-                visitor.visitorEmails = [{address: email}];
+                visitor.visitorEmails = [{ address: email }];
             }
             const phone = request.content.visitor.phone;
             if (phone) {
-                visitor.phone = [{phoneNumber: phone}];
+                visitor.phone = [{ phoneNumber: phone }];
             }
+            const contactUUID = request.content.visitor.contactUUID;
 
             const createdVisitor = await livechatRepo.createVisitor(visitor);
             const room = await livechatRepo.createRoom(
                 request.content.ticketID,
-                request.content.visitor.contactUUID,
+                contactUUID,
                 createdVisitor.visitor,
             );
 
-            // send chatbot history to agent if session start is set
-            if (sessionStart) {
-                const appDataSource = new AppPersistence(read.getPersistenceReader(), persis);
-                const rpHostUrl = await appDataSource.getRPHostUrl();
-                const rpAuthToken = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_RAPIDPRO_AUTH_TOKEN);
-                const reqTimeout = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_REQUEST_TIMEOUT);
+            // send the contact history
+            const appDataSource = new AppPersistence(read.getPersistenceReader(), persis);
+            const rpHostUrl = await appDataSource.getRPHostUrl();
+            const id = 'send-history';
+            const when = 'five seconds';
+            await modify.getScheduler().scheduleOnce({ data: { contactUUID, room, rpHostUrl }, id, when });
 
-                if (rpHostUrl && rpAuthToken) {
-                    const rapidProDataSource: IRapidProRemoteDataSource = new RapidProRestApi(
-                        http,
-                        rpHostUrl,
-                        rpAuthToken,
-                        reqTimeout ? reqTimeout : 5,
-                    );
-                    const messages = await rapidProDataSource.getMessages(
-                        request.content.visitor.contactUUID,
-                        sessionStart,
-                    );
-                    await livechatRepo.sendChatbotHistory(messages, room);
-                }
-            }
-
-            return this.json({status: HttpStatusCode.CREATED, content: {id: room.id}});
+            return this.json({ status: HttpStatusCode.CREATED, content: { id: room.id } });
         } catch (e) {
             this.app.getLogger().error(e);
 
             if (e.constructor.name === AppError.name) {
-                return this.json({status: e.statusCode, content: {error: e.message}});
+                return this.json({ status: e.statusCode, content: { error: e.message } });
             }
-            if (e.constructor.name === RangeError.name) {
-                const errorMsg = `"sessionStart": "Session start is invalid"`;
-                return this.json({status: HttpStatusCode.BAD_REQUEST, content: {error: errorMsg}});
-            }
-            return this.json({status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: {error: 'Unexpected error'}});
+            return this.json({ status: HttpStatusCode.INTERNAL_SERVER_ERROR, content: { error: 'Unexpected error' } });
         }
     }
 
