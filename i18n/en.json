@@ -1,5 +1,5 @@
 {
     "config_app_secret": "App Secret",
-    "config_rapidpro_auth_token": "RapidPro Authorization Token",
+    "config_rapidpro_auth_token": "Weni Authorization Token",
     "config_request_timeout": "Request Timeout"
 }
