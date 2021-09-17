@@ -30,7 +30,8 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
 
         response.data.results.forEach((message) => {
             if (message.status !== 'errored') {
-                const sentOn = DateStringUtils.format(DateStringUtils.addMinutes(message.sent_on, tzOffset), 'dd/MM/yyyy, hh:mm');
+                const date = message.sent_on ?? message.created_on;
+                const sentOn = DateStringUtils.format(DateStringUtils.addMinutes(date, tzOffset), 'dd/MM/yyyy, hh:mm');
 
                 message.text && result.push({ direction: message.direction, sentOn, text: message.text } as RPMessage);
                 message.attachments.forEach((attachment) => {
