@@ -1,17 +1,17 @@
 {
     "id": "02c2b89b-f8c4-446c-abe0-b97c5e0d4649",
-    "version": "1.1.0",
+    "version": "1.1.4",
     "requiredApiVersion": "^1.19.0",
     "iconFile": "icon.png",
     "author": {
-        "name": "Ilhasoft",
-        "homepage": "https://github.com/Ilhasoft/",
+        "name": "Weni",
+        "homepage": "https://push.al/whatsapp/",
         "support": "https://github.com/Ilhasoft/"
     },
-    "name": "Push Tickets",
-    "nameSlug": "push-tickets",
+    "name": "WhatsApp Tickets",
+    "nameSlug": "whatsapp-tickets",
     "classFile": "RapidProApp.ts",
-    "description": "Integration between Omnichannel and Push platform ticketing service",
+    "description": "Unlimited Official WhatsApp solution. The better way to manage the queue of customer calls with a Chatbot on WhatsApp and use it to direct conversations to human support. More than support tickets, it's an intelligent conversational support. Get the solution with us: wa.me/558230225978?&text=hi",
     "implements": [
         "IPostLivechatRoomClosed",
         "IPostMessageSent"
