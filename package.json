@@ -1,6 +1,6 @@
 {
     "devDependencies": {
-        "@rocket.chat/apps-engine": "^1.19.0",
+        "@rocket.chat/apps-engine": "^1.27.1",
         "@types/chai": "^4.2.14",
         "@types/chai-spies": "^1.0.1",
         "@types/faker": "^4.1.12",

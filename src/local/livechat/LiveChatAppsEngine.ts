@@ -59,9 +59,9 @@ export default class LiveChatAppsEngine implements ILivechatInternalDataSource {
                     case 'image':
                         messageAttachments.push({ imageUrl: attachment.url });
                         break;
-                    case 'audio':
-                        messageAttachments.push({ audioUrl: attachment.url });
-                        break;
+                    // case 'audio':
+                    //     messageAttachments.push({ audioUrl: attachment.url });
+                    //     break;
                     case 'video':
                         messageAttachments.push({ videoUrl: attachment.url });
                         break;
