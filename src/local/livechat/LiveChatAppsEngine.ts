@@ -62,9 +62,9 @@ export default class LiveChatAppsEngine implements ILivechatInternalDataSource {
                     // case 'audio':
                     //     messageAttachments.push({ audioUrl: attachment.url });
                     //     break;
-                    case 'video':
-                        messageAttachments.push({ videoUrl: attachment.url });
-                        break;
+                    // case 'video':
+                    //     messageAttachments.push({ videoUrl: attachment.url });
+                    //     break;
                     default: // TODO: wait for appsEngine support the creation of documents attachments
                         if (text) {
                             livechatMessageBuilder.setText(`${text}\n${attachment.url}`);
