@@ -27,6 +27,7 @@ import { VisitorMessageEndpoint } from './src/endpoint/VisitorMessageEndpoint';
 import RapidProRestApi from './src/remote/rapidpro/RapidProRestApi';
 import {
     APP_SETTINGS,
+    CONFIG_DEFAULT_TIMEZONE,
     CONFIG_HISTORY_TIME,
     CONFIG_RAPIDPRO_AUTH_TOKEN,
     CONFIG_REQUEST_TIMEOUT,
@@ -64,6 +65,7 @@ export class RapidProApp extends App implements IPostLivechatRoomClosed, IPostMe
                     const rpAuthToken = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_RAPIDPRO_AUTH_TOKEN);
                     const reqTimeout = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_REQUEST_TIMEOUT);
                     const historyTime = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_HISTORY_TIME);
+                    const defaultTimezone = await read.getEnvironmentReader().getSettings().getValueById(CONFIG_DEFAULT_TIMEZONE)
 
                     const after = new Date();
                     after.setHours(after.getHours() - historyTime);
@@ -77,6 +79,7 @@ export class RapidProApp extends App implements IPostLivechatRoomClosed, IPostMe
                     const messages = await rapidProDataSource.getMessages(
                         job.contactUUID,
                         after.toISOString(),
+                        defaultTimezone,
                     );
 
                     const livechatRepo = new LiveChatRepositoryImpl(

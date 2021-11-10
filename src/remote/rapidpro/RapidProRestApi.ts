@@ -16,7 +16,7 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
         this.timeout = this.timeout < 5 ? 5 : this.timeout;
     }
 
-    public async getMessages(contactUUID: string, after: string): Promise<Array<RPMessage>> {
+    public async getMessages(contactUUID: string, after: string, defaultTimezone: number): Promise<Array<RPMessage>> {
         const reqOptions = this.requestOptions();
         reqOptions['params'] = { contact: contactUUID, after };
 
@@ -24,7 +24,8 @@ export default class RapidProRestApi implements IRapidProRemoteDataSource {
         if (!response || response.statusCode !== HttpStatusCode.OK) {
             return [];
         }
-        const tzOffset = DateStringUtils.getTimezoneOffsetInMinutes(after);
+
+        const tzOffset = defaultTimezone ? defaultTimezone * 60 : DateStringUtils.getTimezoneOffsetInMinutes(after);
 
         const result: Array<RPMessage> = [];
 
