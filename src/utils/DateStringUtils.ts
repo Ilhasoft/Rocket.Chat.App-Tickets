@@ -21,10 +21,10 @@ export default class DateStringUtils {
         const asDate = new Date(date);
 
         pattern = this.formatPart(pattern, 'yyyy', asDate.getFullYear());
-        pattern = this.formatPart(pattern, 'MM', asDate.getMonth());
-        pattern = this.formatPart(pattern, 'M', asDate.getMonth());
-        pattern = this.formatPart(pattern, 'dd', asDate.getDay());
-        pattern = this.formatPart(pattern, 'd', asDate.getDay());
+        pattern = this.formatPart(pattern, 'MM', asDate.getMonth() + 1);
+        pattern = this.formatPart(pattern, 'M', asDate.getMonth() + 1);
+        pattern = this.formatPart(pattern, 'dd', asDate.getDate());
+        pattern = this.formatPart(pattern, 'd', asDate.getDate());
         pattern = this.formatPart(pattern, 'hh', asDate.getHours());
         pattern = this.formatPart(pattern, 'h', asDate.getHours());
         pattern = this.formatPart(pattern, 'mm', asDate.getMinutes());
