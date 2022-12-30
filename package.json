@@ -16,7 +16,7 @@
         "factory.ts": "^0.5.1",
         "faker": "^4.1.0",
         "fs": "0.0.1-security",
-        "mocha": "^8.1.1",
+        "mocha": "^8.4.0",
         "nyc": "^15.1.0",
         "slugify": "^1.4.5",
         "ts-mockito": "^2.6.1",
