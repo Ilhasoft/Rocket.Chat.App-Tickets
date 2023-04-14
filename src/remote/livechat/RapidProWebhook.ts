@@ -40,17 +40,8 @@ export default class RapidProWebhook implements ILivechatWebhook {
                 const url = AttachmentUtils.getUrl(serverUrl, attachment);
                 let type = AttachmentUtils.getType(attachment);
 
-                if (type === 'document') {
-                    if (url.endsWith('.pdf')) {
-                        type += '/pdf';
-                        attachmentsPayload.push({type, url});
-                    }
-                } else {
-                    attachmentsPayload.push({type, url});
-                }
-                if (attachmentsPayload.length === 0) {
-                    return;
-                }
+                attachmentsPayload.push({type, url});
+
                 payload.data['attachments'] = attachmentsPayload;
             });
         }
